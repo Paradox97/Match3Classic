@@ -69,17 +69,25 @@ namespace Match3Classic
 
             this.textures = new List<Texture2D>();
 
+            
             textures.Add(Content.Load<Texture2D>("img/text/match 3"));
             textures.Add(Content.Load<Texture2D>("img/text/classic_resize"));
+            textures.Add(Content.Load<Texture2D>("img/figures/Star"));
 
-            float[] logoLocation = new float[2];
-            logoLocation = this.screen.GetLogoLocation(Window, textures[0]);
+            //float[] logoLocation = new float[2] {1f,0f};
+            float [] logoLocation = this.screen.GetLogoLocation(Window, textures[0]);
             //_texture2D = Content.Load<Texture2D>("img/match 3");
 
 
             this.sprites = new List<Sprite>() {
                 new Sprite(textures[0])
                 {
+                   /* _origin = new Vector2
+                    (
+                       logoLocation[0]/2,
+                       logoLocation[1]/2
+                     ),
+                   */
                     _position2D = new Vector2
                     (
                        logoLocation[0],
@@ -96,6 +104,13 @@ namespace Match3Classic
                 ,
                 new Sprite(textures[1])
                 {
+                    /*
+                    _origin = new Vector2
+                    (
+                        textures[1].Width/2 ,
+                        textures[1].Height/2
+                     ),
+                    */
                     _position2D = new Vector2
                     (
                         logoLocation[0]+textures[0].Width-textures[1].Width,
@@ -105,9 +120,32 @@ namespace Match3Classic
                     Input = new Input()
                     {
                     }
+                },
+                new Sprite(textures[2])
+                {
+                    _positionInit = new Vector2(
+                        100,
+                        100
+                        ),
+                    _position2D = new Vector2
+                    (
+                        100,
+                        100
+                    ),
+
+                    _origin = new Vector2
+                        (
+                        textures[2].Width/2,
+                        textures[2].Height/2
+                        ),
+
+                    Input = new Input()
+                    {
+                    }
                 }
 
             };
+    
 
             // TODO: use this.Content to load your game content here
         }
