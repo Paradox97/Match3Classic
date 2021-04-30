@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "yE5o9U45PML15SIT60uXh0ExzlIiWICnjHUdw8Eb0tGvOWb/Yk6663I1zEJfsfO158j6vWnvfV7gycyNHL6o+w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Пека\\source\\repos\\Match3Classic\\Match3Classic\\Match3Classic.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Пека\\.nuget\\packages\\monogame.content.builder.task\\3.8.0.1641\\monogame.content.builder.task.3.8.0.1641.nupkg.sha512",
+    "C:\\Users\\Пека\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.0.1641\\monogame.framework.desktopgl.3.8.0.1641.nupkg.sha512"
+  ],
+  "logs": []
+}
