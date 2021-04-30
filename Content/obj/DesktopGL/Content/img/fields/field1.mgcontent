@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Rectangle.png</SourceFile>
-  <SourceTime>2021-04-30T18:01:15.2345585+10:00</SourceTime>
-  <DestFile>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/bin/DesktopGL/img/figures/Rectangle.xnb</DestFile>
-  <DestTime>2021-04-30T21:15:15.7561109+10:00</DestTime>
+  <SourceFile>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fields/field1.png</SourceFile>
+  <SourceTime>2021-04-30T20:56:42.2403059+10:00</SourceTime>
+  <DestFile>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/bin/DesktopGL/Content/img/fields/field1.xnb</DestFile>
+  <DestTime>2021-04-30T20:58:54.6642843+10:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-08-10T16:17:54+10:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

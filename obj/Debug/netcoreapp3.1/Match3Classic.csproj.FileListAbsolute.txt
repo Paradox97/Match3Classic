@@ -50,3 +50,5 @@ C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\Quit.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\Start.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\Yes.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fields\field1.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fields\field2.xnb

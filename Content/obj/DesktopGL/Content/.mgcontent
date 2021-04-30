@@ -4,6 +4,8 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fields/field1.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fields/field2.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Circle.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Heart.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Rectangle.png</File>
@@ -23,6 +25,8 @@
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/text/Yes.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

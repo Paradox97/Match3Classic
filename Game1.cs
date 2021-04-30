@@ -60,11 +60,14 @@ namespace Match3Classic
         {
             // TODO: Add your initialization logic here
             //gametime = new GameTime();
+            _graphics.PreferredBackBufferWidth = 1024;  // set this value to the desired width of your window
+            _graphics.PreferredBackBufferHeight = 600;   // set this value to the desired height of your window
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            _graphics.ApplyChanges();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             this.textures = new List<Texture2D>();
@@ -72,7 +75,10 @@ namespace Match3Classic
             
             textures.Add(Content.Load<Texture2D>("img/text/match 3"));
             textures.Add(Content.Load<Texture2D>("img/text/classic_resize"));
+            textures.Add(Content.Load<Texture2D>("img/fields/field2"));
             textures.Add(Content.Load<Texture2D>("img/figures/Star"));
+
+            float deltaField = 5f;
 
             //float[] logoLocation = new float[2] {1f,0f};
             float [] logoLocation = this.screen.GetLogoLocation(Window, textures[0]);
@@ -123,28 +129,51 @@ namespace Match3Classic
                 },
                 new Sprite(textures[2])
                 {
-                    _positionInit = new Vector2(
-                        100,
-                        100
-                        ),
                     _position2D = new Vector2
                     (
-                        100,
-                        100
+                        10, 
+                        0+textures[0].Height+textures[1].Height
                     ),
-
-                    _origin = new Vector2
-                        (
-                        textures[2].Width/2,
-                        textures[2].Height/2
-                        ),
 
                     Input = new Input()
                     {
                     }
-                }
-
+                }   
             };
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    this.sprites.Add(new Sprite(textures[3])
+                    {
+                        _positionInit = new Vector2(
+                            sprites[2]._position2D.X + i * deltaField + i * textures[3].Width + textures[3].Width/2,
+                            sprites[2]._position2D.Y + j * deltaField + j * textures[3].Height + textures[3].Height / 2 + deltaField
+                            ),
+
+                        _position2D = new Vector2           //в конструктор из positionInit
+                        (
+                            sprites[2]._position2D.X + i * deltaField + i * textures[3].Width + textures[3].Width / 2,
+                            sprites[2]._position2D.Y + j * deltaField + j * textures[3].Height + textures[3].Height / 2 + deltaField
+                        ),
+
+                        _origin = new Vector2
+                            (
+                            textures[3].Width / 2,
+                            textures[3].Height / 2
+                            ),
+
+                        Input = new Input()
+                        {
+                        },
+                        MouseInput = new MouseInput()
+                        {
+
+                        }
+                    });
+                }
+             }
     
 
             // TODO: use this.Content to load your game content here

@@ -17,13 +17,15 @@ public class Sprite
     public Vector2 _positionInit;
 
     public float _rotation,
-        RotationSpeed = 3f, MoveSpeed = 3f;
+        RotationSpeed = 3f, MoveSpeed = 3f,
+        RotationSoFar = 0f;
     
     public float Scale = 1f;
     
     public bool 
         isDragged, isRotating;
     public Input Input;
+    public MouseInput MouseInput;
 
     MouseState lastMouseState, currentMouseState;
     public Sprite(Texture2D texture)
@@ -34,102 +36,92 @@ public class Sprite
     public ButtonState LeftButton { get; }
     public void CheckIfTarget()
     {
-        Vector2 hitBoxDelta = new Vector2(          //hitbox of a figure is smaller than it appears to avoid collision
-            this._texture2D.Width / 10,
-            this._texture2D.Height / 10
-            );
-
-        this.lastMouseState = this.currentMouseState;
-
-        this.currentMouseState = Mouse.GetState();
-
-        Vector2 mousePosition = new Vector2(currentMouseState.X, currentMouseState.Y);
-
-        /*
-        if (currentMouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
+        if (this.MouseInput != null)
         {
-            if (
-                ((this._position2D.X + hitBoxDelta.X <= mousePosition.X))
-                &&
-                ((this._position2D.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
-                &&
-                ((this._position2D.Y + hitBoxDelta.Y <= mousePosition.Y))
-                &&
-                ((this._position2D.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
-               )
-                this.isDragged = true;
-            
-            
-        }*/
 
-        if (currentMouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
-        {
-            if (
-                ((this._position2D.X - this._origin.X + hitBoxDelta.X <= mousePosition.X))
-                &&
-                ((this._position2D.X - this._origin.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
-                &&
-                ((this._position2D.Y - this._origin.Y + hitBoxDelta.Y <= mousePosition.Y))
-                &&
-                ((this._position2D.Y - this._origin.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
-               )
-                this.isDragged = true;
+            Vector2 hitBoxDelta = new Vector2(          //hitbox of a figure is smaller than it appears to avoid collision
+                this._texture2D.Width / 10,
+                this._texture2D.Height / 10
+                );
 
+            this.lastMouseState = this.currentMouseState;
 
-        }
+            this.currentMouseState = Mouse.GetState();
 
+            Vector2 mousePosition = new Vector2(currentMouseState.X, currentMouseState.Y);
 
-        if (currentMouseState.RightButton == ButtonState.Pressed && lastMouseState.RightButton == ButtonState.Released)
-        {
-            if (
-                ((this._position2D.X - this._origin.X + hitBoxDelta.X <= mousePosition.X))
-                &&
-                ((this._position2D.X - this._origin.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
-                &&
-                ((this._position2D.Y - this._origin.Y + hitBoxDelta.Y <= mousePosition.Y))
-                &&
-                ((this._position2D.Y - this._origin.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
-               )
-                this.isRotating = true;
-
-
-        }
-
-
-        if (this.isDragged == true)
-        {
-            this._position2D = mousePosition;
-            if (currentMouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed)
+            /*
+            if (currentMouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
             {
-                this._position2D = this._positionInit;
-                this.isDragged = false;
+                if (
+                    ((this._position2D.X + hitBoxDelta.X <= mousePosition.X))
+                    &&
+                    ((this._position2D.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
+                    &&
+                    ((this._position2D.Y + hitBoxDelta.Y <= mousePosition.Y))
+                    &&
+                    ((this._position2D.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
+                   )
+                    this.isDragged = true;
+
+
+            }*/
+
+            if (currentMouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
+            {
+                if (
+                    ((this._position2D.X - this._origin.X + hitBoxDelta.X <= mousePosition.X))
+                    &&
+                    ((this._position2D.X - this._origin.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
+                    &&
+                    ((this._position2D.Y - this._origin.Y + hitBoxDelta.Y <= mousePosition.Y))
+                    &&
+                    ((this._position2D.Y - this._origin.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
+                   )
+                    this.isDragged = true;
+
+
             }
-        }
 
-        if (this.isRotating == true)
-        {
-            if (
-                ((this._position2D.X - this._origin.X + hitBoxDelta.X <= mousePosition.X))
-                &&
-                ((this._position2D.X - this._origin.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
-                &&
-                ((this._position2D.Y - this._origin.Y + hitBoxDelta.Y <= mousePosition.Y))
-                &&
-                ((this._position2D.Y - this._origin.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
-               )
+
+            if (currentMouseState.RightButton == ButtonState.Pressed && lastMouseState.RightButton == ButtonState.Released)
             {
+                if (
+                    ((this._position2D.X - this._origin.X + hitBoxDelta.X <= mousePosition.X))
+                    &&
+                    ((this._position2D.X - this._origin.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
+                    &&
+                    ((this._position2D.Y - this._origin.Y + hitBoxDelta.Y <= mousePosition.Y))
+                    &&
+                    ((this._position2D.Y - this._origin.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
+                   )
+                    this.isRotating = true;
 
+
+            }
+
+
+            if (this.isDragged == true)
+            {
+                this._position2D = mousePosition;
+                if (currentMouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed)
+                {
+                    this._position2D = this._positionInit;
+                    this.isDragged = false;
+                }
+            }
+
+            if (this.isRotating == true)
+            {
                 this._rotation += MathHelper.ToRadians(RotationSpeed);
                 if
                     (currentMouseState.RightButton == ButtonState.Released && lastMouseState.RightButton == ButtonState.Pressed)
                 {
+                    this._rotation = 0f;
                     this.isRotating = false;
                 }
             }
         }
-
-
-
     }
 
 	public void Update()
