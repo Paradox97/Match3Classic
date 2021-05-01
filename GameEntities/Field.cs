@@ -10,10 +10,14 @@ using System.IO;
 using System.Collections.Generic;
 
 
-namespace Tetris
+namespace Match3Classic
 {
     public class Field
     {
+        Shape shape;
+        const int FIELD_SIZE = 8,
+            FIELDSIZE = 64;
+
         public int
             width, height,
             block_size,
@@ -24,9 +28,45 @@ namespace Tetris
             gameover,
             exit, pause;
 
+        public float percentPreMatch;
+
         public char[,] area;
 
+        public int[,] _field;
+
         string player_name;
+
+
+
+        public struct graph
+        {
+            public int[,] _distanceMatrix;
+            public int[,] _fieldMatrix;
+            public graph(int[,] distanceMatrix, int[,] fieldMatrix)
+            {
+                this._fieldMatrix = fieldMatrix;
+                this._distanceMatrix = distanceMatrix;
+            }
+        }
+
+
+        public struct graph2
+        {
+            public int 
+                i,
+                j,
+                value;
+            public graph2(int i, int j, int value)
+            {
+                this.i = i;
+                this.j = j;
+                this.value = value;
+            }
+        }
+
+        List<graph2> Graph;
+
+        public graph _graph;
 
         public struct text_menu
         {
@@ -77,7 +117,78 @@ namespace Tetris
             }
         }
 
-        public void render()
+        public void FieldCreate(Shape shape)
+        {
+            
+                for (var i = 0; i < FIELD_SIZE; i++)
+                {
+                for (var j = 0; j < FIELD_SIZE; j++)
+                {
+                    this._graph._fieldMatrix[i, j] = shape.ShapeCreate();
+                    this.Graph.Add(new graph2(i, j, this._graph._fieldMatrix[i, j]));
+                }
+            }
+
+            ImproveRandom();
+           // Render();
+
+        }
+
+        public int Bfs()
+        {
+
+            return 0;
+        }
+
+        public void ImproveRandom()
+        {
+            Graph.Sort((x,y) => x.value.CompareTo(y.value));
+            
+            foreach (var g in Graph)
+                Console.WriteLine(g.value);
+        }
+
+        public Field()
+        {
+            this.Graph = new List<graph2>();
+
+            this._graph = new graph(new int [FIELD_SIZE, FIELD_SIZE], new int[FIELD_SIZE, FIELD_SIZE]);
+           
+
+            this.shape = new Shape();
+
+            this._field = new int[FIELD_SIZE, FIELD_SIZE];
+
+            FieldCreate(shape);
+        }
+
+
+        public void Render()
+        {
+            Console.SetCursorPosition(0, 0);
+            //FieldCreate(shape);
+
+            string output = string.Empty;
+
+          
+            for (int i = 0; i < FIELD_SIZE; i++)
+            {
+                for (int j = 0; j < FIELD_SIZE; j++)
+                {
+                    output += this._graph._fieldMatrix[i, j];
+                    output += ' ';
+                }
+                output += "|\n";
+            }
+
+
+          
+            Console.Write(output);
+
+        }
+
+
+            public void render()
         {
             Console.SetCursorPosition(0, 0);
 

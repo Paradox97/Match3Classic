@@ -1,27 +1,32 @@
 ﻿using System;
 using System.Linq;
 using System.Drawing;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 
-namespace Tetris
+namespace Match3Classic
 {
     public class Shape
     {
         //public int x_coord, y_coord;
         const int SHAPE_QUANTITY = 5, SHAPE_SIZE = 4;
 
-        private enum Shapetype
+        private enum ShapeType
         {
-            line = 0,
-            l_shape = 1,
-            square = 2,
-            t_shape = 3,
-            s_shape = 4
+            Circle = 3,
+            Heart = 4,
+            Rectangle = 5,
+            Star = 6,
+            Star2 = 7
         }
 
         int center, shape_type;
 
+        ShapeType shapeType;
         public struct shape_block
         {
             public int x_coord;
@@ -39,8 +44,26 @@ namespace Tetris
 
         public Shape(Field grid) //Shape constructor
         {
-            shape_map_create(grid);
+            //shape_map_create(grid);
         }
+
+        public Shape()
+        {
+
+
+        }
+
+
+        public string[,] _field;
+        public int ShapeCreate()
+        {
+            ShapeType[] shapes = ((ShapeType[]) Enum.GetValues(typeof(ShapeType)));
+            this.shapeType = shapes[new Random().Next(0, shapes.Length)];
+            //check if 10-15% 
+            //Console.WriteLine(shapeType.ToString());
+            return (int)shapeType;
+        }
+
 
         private int shape_map_create(Field grid)      //hard coded shapes
         {

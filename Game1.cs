@@ -12,6 +12,8 @@ namespace Match3Classic
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        Shape shape;
+        Field grid;
         public GameTime gametime;
         
         public char[,] field 
@@ -50,8 +52,13 @@ namespace Match3Classic
 
         public Game1()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            this.grid = new Field();
+            shape = new Shape(grid);
+            grid.Render();
             this.screen = new Screen();
+
+
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -73,10 +80,18 @@ namespace Match3Classic
             this.textures = new List<Texture2D>();
 
             
+
+            
             textures.Add(Content.Load<Texture2D>("img/text/match 3"));
             textures.Add(Content.Load<Texture2D>("img/text/classic_resize"));
             textures.Add(Content.Load<Texture2D>("img/fields/field2"));
+            textures.Add(Content.Load<Texture2D>("img/figures/Circle"));
+            textures.Add(Content.Load<Texture2D>("img/figures/Heart"));
+            textures.Add(Content.Load<Texture2D>("img/figures/Rectangle"));
             textures.Add(Content.Load<Texture2D>("img/figures/Star"));
+            textures.Add(Content.Load<Texture2D>("img/figures/Star2"));
+
+           
 
             float deltaField = 5f;
 
@@ -141,27 +156,28 @@ namespace Match3Classic
                 }   
             };
 
+
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    this.sprites.Add(new Sprite(textures[3])
+                    this.sprites.Add(new Sprite(textures[grid._graph._fieldMatrix[i,j]])
                     {
                         _positionInit = new Vector2(
-                            sprites[2]._position2D.X + i * deltaField + i * textures[3].Width + textures[3].Width/2,
-                            sprites[2]._position2D.Y + j * deltaField + j * textures[3].Height + textures[3].Height / 2 + deltaField
+                            sprites[2]._position2D.X + i * deltaField + i * textures[grid._graph._fieldMatrix[i, j]].Width + textures[grid._graph._fieldMatrix[i, j]].Width/2,
+                            sprites[2]._position2D.Y + j * deltaField + j * textures[grid._graph._fieldMatrix[i, j]].Height + textures[grid._graph._fieldMatrix[i, j]].Height / 2 + deltaField
                             ),
 
                         _position2D = new Vector2           //в конструктор из positionInit
                         (
-                            sprites[2]._position2D.X + i * deltaField + i * textures[3].Width + textures[3].Width / 2,
-                            sprites[2]._position2D.Y + j * deltaField + j * textures[3].Height + textures[3].Height / 2 + deltaField
+                            sprites[2]._position2D.X + i * deltaField + i * textures[grid._graph._fieldMatrix[i, j]].Width + textures[grid._graph._fieldMatrix[i, j]].Width / 2,
+                            sprites[2]._position2D.Y + j * deltaField + j * textures[grid._graph._fieldMatrix[i, j]].Height + textures[grid._graph._fieldMatrix[i, j]].Height / 2 + deltaField
                         ),
 
                         _origin = new Vector2
                             (
-                            textures[3].Width / 2,
-                            textures[3].Height / 2
+                            textures[grid._graph._fieldMatrix[i, j]].Width / 2,
+                            textures[grid._graph._fieldMatrix[i, j]].Height / 2
                             ),
 
                         Input = new Input()
@@ -181,7 +197,7 @@ namespace Match3Classic
 
         protected override void UnloadContent()
         {
-            //base.UnloadContent();
+            base.UnloadContent();
         }
 
         protected override void Update(GameTime gameTime)
