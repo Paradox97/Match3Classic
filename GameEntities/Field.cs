@@ -16,13 +16,17 @@ namespace Match3Classic
     {
         Shape shape;
         const int FIELD_SIZE = 8,
-            FIELDSIZE = 64;
+            FIELDSIZE = 64,
+            PROXIMITY_DISTANCE = 2,
+            MATCH_CONDITION = 3;
 
         public int
             width, height,
             block_size,
             start_x, start_y,
             score, period;
+
+
 
         public bool
             gameover,
@@ -36,38 +40,6 @@ namespace Match3Classic
 
         string player_name;
 
-
-
-        public struct graph
-        {
-            public int[,] _distanceMatrix;
-            public int[,] _fieldMatrix;
-            public graph(int[,] distanceMatrix, int[,] fieldMatrix)
-            {
-                this._fieldMatrix = fieldMatrix;
-                this._distanceMatrix = distanceMatrix;
-            }
-        }
-
-
-        public struct graph2
-        {
-            public int 
-                i,
-                j,
-                value;
-            public graph2(int i, int j, int value)
-            {
-                this.i = i;
-                this.j = j;
-                this.value = value;
-            }
-        }
-
-        List<graph2> Graph;
-
-        public graph _graph;
-
         public struct text_menu
         {
             public string order;
@@ -80,6 +52,28 @@ namespace Match3Classic
             }
 
         }
+
+        public int start_finding = 0;
+
+
+        public struct Match
+        {
+            public int i;
+            public int j;
+            //public bool isVisited;
+
+            public Match(int i, int j)
+            {
+                this.i = i;
+                this.j = j;
+                //this.isVisited = isVisited;
+            }
+
+        }
+
+        public List<Match> _match;
+        public Match _horizontalMatch;
+        public Match _verticalMatch;
 
         public List<text_menu> text_menus;
 
@@ -117,49 +111,34 @@ namespace Match3Classic
             }
         }
 
-        public void FieldCreate(Shape shape)
+        public void FieldCreate(Shape shape, int[,] delta)
         {
-            
-                for (var i = 0; i < FIELD_SIZE; i++)
-                {
+
+            for (var i = 0; i < FIELD_SIZE; i++)
+            {
                 for (var j = 0; j < FIELD_SIZE; j++)
                 {
-                    this._graph._fieldMatrix[i, j] = shape.ShapeCreate();
-                    this.Graph.Add(new graph2(i, j, this._graph._fieldMatrix[i, j]));
+                    this._field[i, j] = 6;
                 }
             }
 
-            ImproveRandom();
-           // Render();
+            this._field[0, 0] = 4;
 
-        }
+            //check if 10-15% 
+            //Console.WriteLine(shapeType.ToString());
 
-        public int Bfs()
-        {
+            // Render();
 
-            return 0;
-        }
-
-        public void ImproveRandom()
-        {
-            Graph.Sort((x,y) => x.value.CompareTo(y.value));
-            
-            foreach (var g in Graph)
-                Console.WriteLine(g.value);
         }
 
         public Field()
         {
-            this.Graph = new List<graph2>();
-
-            this._graph = new graph(new int [FIELD_SIZE, FIELD_SIZE], new int[FIELD_SIZE, FIELD_SIZE]);
-           
-
+            this._match = new List<Match>();
             this.shape = new Shape();
 
             this._field = new int[FIELD_SIZE, FIELD_SIZE];
 
-            FieldCreate(shape);
+            FieldCreate(shape, this._field);
         }
 
 
@@ -175,409 +154,296 @@ namespace Match3Classic
             {
                 for (int j = 0; j < FIELD_SIZE; j++)
                 {
-                    output += this._graph._fieldMatrix[i, j];
+                    this.start_finding = 1;
+                   // this._match.Add(new Match(i, j, true));
+                   // BFS(i, j, _field[i, j], 0, this._match);    //check matches
+                    output += this._field[j, i];
                     output += ' ';
                 }
                 output += "|\n";
             }
 
-
-          
-            Console.Write(output);
-
-        }
-
-
-            public void render()
-        {
-            Console.SetCursorPosition(0, 0);
-
-            string output = string.Empty;
-
-            for (int i = 0; i < this.height; i++)
-            {
-                for (int j = 0; j < this.width; j++)
-                {
-                    output += this.area[j, i];
-                }
-                output += "|\n";
-
-                if (i == 1)
-                {
-                    for (int j = 0; j < this.width; j++)
-                    {
-                        output += '-';
-                    }
-                    output += "|\n";
-                }
-            }
-
-            for (int j = 0; j < this.width; j++)
-            {
-                output += "^";
-            }
-
-            output += "|\n Score: " + this.score + "\n (Space)Rotate" + " (<-)Left " + "(->)Right (↓)Down \n (P)Pause (F)Faster (S)Slower (Q)Quit";
+            Console.WriteLine(IfMatch(0, 0));
 
             Console.Write(output);
 
         }
 
-        public int update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
+        /*
+        public void BFS(int i, int j, int value, int MatchType, List<Match> matches)
         {
-            input = Console.ReadKey(true);
+            if (value == 11)
+                return;
 
-            switch (input.Key)
+            int k = i;
+            int z = j;
+            bool isvisited;
+
+            List<Match> Temp = new List<Match>();
+
+            if (this.start_finding == 1)
             {
-                case ConsoleKey.LeftArrow:
-                    figure.move_left(grid);
-                    break;              //watch breaks and returns
+                this.start_finding = 0;
 
-                case ConsoleKey.RightArrow:
-                    figure.move_right(grid);
-                    break;
+                if ((k + 1 < FIELD_SIZE) && (_field[k + 1, z] == value) )    //horizontal match - right 
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k + 1, z, true));
+                    BFS(k + 1, z, value, 0, Temp);
+                }
 
-                case ConsoleKey.DownArrow:
-                    figure.move_down(grid);
-                    break;
+                if ((k - 1 > 0) && (_field[k - 1, z] == value))         //horizontal match - left
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k - 1, z, true));
+                    BFS(k - 1, z, value, 0, Temp);
+                }
 
-                case ConsoleKey.Spacebar:
-                    figure.rotate(grid);
-                    break;
+                if ((z + 1 < FIELD_SIZE) && (_field[k, z + 1] == value))        //vertical match - down
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k, z + 1, true));
+                    BFS(k, z + 1, value, 0, Temp);
+                }
 
-                case ConsoleKey.Q:
-                    grid.exit = true;
-                    return 1;
-
-                case ConsoleKey.P:
-                    grid.pause = !grid.pause;
-                    return 2;
-
-                case ConsoleKey.F:
-                    if (grid.period > 10)
-                        grid.period -= 10;
-                    return 3;
-
-                case ConsoleKey.S:
-                    if (grid.period < 300)
-                        grid.period += 10;
-                    return 4;
+                if ((z - 1 > 0) && (_field[k, z - 1] == value))         //vertical match - up
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k, z - 1, true));
+                    BFS(k, z - 1, value, 0, Temp);
+                }
             }
 
-            return 0;
-        }
-
-        static void high_score()
-        {
-            string file_name = "Tetris.records";
-            string path = AppDomain.CurrentDomain.BaseDirectory + file_name;
-            string output = string.Empty;
-            if (!File.Exists(path))
+            if (MatchType == 0)   //horizontal match
             {
-                using (StreamWriter write = File.CreateText(path))
+
+                if ((k + 1 < FIELD_SIZE) && (_field[k + 1, z] == value) && (IsVisited(matches, k + 1, z) == 1))    //horizontal match - right  if not visited
                 {
-                    for (int i = 0; i < 67; i++)
+                   
+                    Temp = matches;
+                    Temp.Add(new Match(k + 1, z, true));
+                    BFS(k + 1, z, value, 0, Temp);
+                }
+
+                if ((k - 1 > 0) && (_field[k - 1, z] == value) && (IsVisited(matches, k - 1, z) == 1))         //horizontal match - left
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k - 1, z, true));
+                    BFS(k - 1, z, value, 0, Temp);
+                }
+
+                if ((z + 1 < FIELD_SIZE) && (_field[k, z + 1] == value) && (IsVisited(matches, k, z + 1) == 1))        //vertical match - down
+                {
+                    Temp.Add(new Match(k, z, true));
+                    Temp.Add(new Match(k, z + 1, true));
+                    BFS(k, z + 1, value, 1, Temp);
+                }
+
+                if ((z - 1 > 0) && (_field[k, z - 1] == value) && (IsVisited(matches, k, z - 1) == 1))         //vertical match - up
+                {
+                    Temp.Add(new Match(k, z, true));
+                    Temp.Add(new Match(k, z - 1, true));
+                    BFS(k, z - 1, value, 1, Temp);
+                }
+
+                if (Temp.Count >= MATCH_CONDITION)
+                {
+                    for (int m = 0; m < Temp.Count; m++)
                     {
-                        output += "#";
+                        matches.Add(Temp[m]);
                     }
-                    write.WriteLine(output);
+                    this._match = matches;
+                }
+            }
+
+
+            if (MatchType == 1)     //vertical match
+            {
+
+                if ((k + 1 < FIELD_SIZE) && (_field[k + 1, z] == value) && (IsVisited(matches, k + 1, z) == 1))    //horizontal match - right 
+                {
+                    Temp.Add(new Match(k, z, true));
+                    Temp.Add(new Match(k + 1, z, true));
+                    BFS(k + 1, z, value, 0, Temp);
                 }
 
-            }
-        }
+                if ((k - 1 > 0) && (_field[k - 1, z] == value) && (IsVisited(matches, k - 1, z) == 1))         //horizontal match - left
+                {
+                    Temp.Add(new Match(k, z, true));
+                    Temp.Add(new Match(k - 1, z, true));
+                    BFS(k - 1, z, value, 0, Temp);
+                }
 
-        public void game_over()
-        {
-            Console.WriteLine("12312312341441q");
-            System.Threading.Thread.Sleep(500);
+                if ((z + 1 < FIELD_SIZE) && (_field[k, z + 1] == value) && (IsVisited(matches, k, z + 1) == 1))        //vertical match - down
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k, z + 1, true));
+                    BFS(k, z + 1, value, 1, Temp);
+                }
 
-        }
+                if ((z - 1 > 0) && (_field[k, z - 1] == value) && (IsVisited(matches, k, z - 1) == 1))         //vertical match - up
+                {
+                    Temp = matches;
+                    Temp.Add(new Match(k, z - 1, true));
+                    BFS(k, z - 1, value, 1, Temp);
+                }
 
-        static int navigation(ConsoleKeyInfo input)
-        {
-            switch (input.Key)
-            {
-                case ConsoleKey.S:
-                    return 0;
-
-                case ConsoleKey.H:
-                    return 1;
-
-                case ConsoleKey.Q:
-                    return 2;
-
-                case ConsoleKey.Y:
-                    return 3;
-
-                case ConsoleKey.N:
-                    return 4;
-
-                case ConsoleKey.D1:
-                    return 5;
-
-                case ConsoleKey.D2:
-                    return 6;
-
-                case ConsoleKey.D3:
-                    return 7;
-            }
-            return 8;
-
-        }
-
-        static void start(string[] alltext, int state)
-        {
-            string output = string.Empty;
-            ConsoleKeyInfo input_key;
-
-            int choice_start_menu = 0;
-
-            Console.SetCursorPosition(0, 0);
-            output = alltext[0] + alltext[7];
-            //Console
-
-
-        }
-
-        static int static_screens_travel(string[] alltext, int state, int choice)
-        {
-            switch (state)
-            {
-                case 0:             //main menu
-                    switch (choice)
+                if (Temp.Count >= MATCH_CONDITION)
+                {
+                    for (int m = 0; m < Temp.Count; m++)
                     {
-                        case 0:
-                            game(10, 15, alltext, state);
-                            return 1;
-                        case 1:
-                            return 1;
-                        case 2:
-                            escape(alltext, state);
-                            return 2;
-                        case 3:
-                            return 3;
-                        case 4:
-                            return 4;
+                        matches.Add(Temp[m]);
                     }
-                    break;
-                case 1:            //difficulty choice menu
-                    break;
-                case 2:            //field size choice menu
-                    break;
-                case 4:            //high score screen
-                    break;
-                case 5:            //quit screen
-                    break;
-            }
-            return 5;
-        }
-
-        static void main_menu(string[] alltext, int state)
-        {
-            List<text_menu> text_Menus = new List<text_menu>();
-
-            //    shape_map = new List<shape_block>();
-            //List<shape_block> check_map = new List<shape_block>();
-            state = 0;
-            string output = string.Empty;
-
-            int choice_main_menu = 0;
-            ConsoleKeyInfo input_key;
-
-            Console.SetCursorPosition(0, 0);
-
-            output = alltext[14] + alltext[0] + alltext[2];
-
-            while (alltext[10] == string.Empty)
-            {
-                Console.Write(output);
-                alltext[10] = Console.ReadLine();
-                Console.Clear();
-            }
-            Console.SetCursorPosition(0, 0);
-            output = alltext[14] + alltext[0] + alltext[3] + alltext[10] + alltext[13] + alltext[5];//alltext[4] + alltext[5];
-            Console.Write(output);
-
-            input_key = Console.ReadKey(true);
-            Console.Clear();
-
-            while ((choice_main_menu = navigation(input_key)) > 7)
-            {
-                Console.Write(output);
-                input_key = Console.ReadKey(true);
-                Console.Clear();
-            }
-
-
-            // static_screens_travel(alltext, state, choice_main_menu);
-            // return;
-
-
-            switch (choice_main_menu)
-            {
-                case 0:
-                    game(15, 20, alltext, state);
-                    break;
-                case 1:
-                    high_score();
-                    break;
-                case 2:
-                    escape(alltext, state);
-                    return;
-
-                case 3:
-                    return;
-
-                case 4:
-                    return;
-            }
-
-
-
-
-        }
-
-        static void escape(string[] alltext, int state)
-        {
-            int choice = 0;
-            ConsoleKeyInfo input_key;
-            Console.Write("Are you sure?(Y/N)");
-            input_key = Console.ReadKey(true);
-            Console.Clear();
-
-            while ((choice = navigation(input_key)) > 7)
-            {
-                Console.Write("Are you sure?(Y/N)");
-                input_key = Console.ReadKey(true);
-                Console.Clear();
-            }
-
-            switch (choice)
-            {
-                case 3:
-                    return;
-                case 4:
-                    main_menu(alltext, state);
-                    break;
+                    this._match = matches;
+                }
             }
         }
+        */
 
-        static int game(int width, int height, string[] alltext, int state)
+        /*
+
+        public int IsVisited(List<Match> matches, int i, int j)
         {
-            Console.WriteLine("Press Any key");
-            const int PLAYER_TIMEOUT = 3;
-
-            int counter = 0;
-
-            Field grid = new Field(width, height, 0, 0, 10, 0, alltext[10]);
-
-
-            Shape figure = new Shape(grid);
-
-            ConsoleKeyInfo input = Console.ReadKey(true);
-
-            grid.render();
-
-            while (grid.exit == false)
+            for (int m = 0; m < matches.Count; m++)
             {
-                if (grid.gameover == true)
+                if ((matches[m].i == i) && (matches[m].j == j))
                 {
-                    Console.Clear();
-                    Console.WriteLine(alltext[15] + "\n Press Any key");
-                    Console.ReadKey();
-                    Console.Clear();
-                    main_menu(alltext, state);
-                    return 4;   //game over state
+                    if (matches[m].isVisited == true)
+                        return 0;
+                    else
+                        return 1;
+                }
+            }
+            return -1;
+        }*/
+
+        public void CheckMatch(int i, int j)
+        {
+            int[,] temp = new int[FIELD_SIZE, FIELD_SIZE];
+            int value = this._field[i, j];
+
+            if (value == 11)
+                return;
+
+            List<Match> hor_match = new List<Match>();
+            List<Match> vert_match = new List<Match>();
+            List<Match> all_matches = new List<Match>();
+
+            if ((i + 2 < FIELD_SIZE) && (this._field[i + 1, j] == value) && (this._field[i + 2, j] == value))
+            {
+                hor_match.Add(new Match(i, j));
+                hor_match.Add(new Match(i + 1, j));
+                hor_match.Add(new Match(i + 2, j));
+            }
+        
+
+
+            if (j + 2 < FIELD_SIZE)
+            {
+                if ((this._field[i, j + 1] == value) && (this._field[i, j + 2] == value))
+                {
+                    vert_match.Add(new Match(i, j));
+                    vert_match.Add(new Match(i, j + 1));
+                    vert_match.Add(new Match(i, j + 2));
+
+
+
+
                 }
 
-                grid.render();
+            }
 
-                Task<int> task_update = new Task<int>(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
-                task_update.Start();
+        }
 
-                while (grid.pause == true)
+        public int IfMatch(int i, int j)
+        {
+            int value = this._field[i, j];
+
+            if (value == 11)
+                return 0;
+
+            try
+            {
+                if(this._field[i + 1, j] == value)
                 {
-                    if (grid.exit)
+                    if (this._field[i + 2, j] == value)
                     {
-                        Console.Clear();
-                        Console.WriteLine(alltext[15] + "\n Press Any key");
-                        Console.ReadKey();
-                        Console.Clear();
-                        main_menu(alltext, state);
-                        return 3;
-                    }      //quit
-                    System.Threading.Thread.Sleep(500);
-                }
+                        return 1;
+                    }
 
-                if ((counter % grid.period) == 0)
+                    if (this._field[i - 1, j] == value)
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (this._field[i - 1, j] == value)
                 {
-                    figure.move_down(grid);  //giving time to react
+                    if (this._field[i - 2, j] == value)
+                    {
+                        return 1;
+                    }
                 }
+            }
+            catch
+            {
+            }
 
-                counter++;
-                System.Threading.Thread.Sleep(PLAYER_TIMEOUT);
+            try
+            {
+                if (this._field[i, j + 1] == value)
+                {
+                    if (this._field[i, j + 2] == value)
+                    {
+                        return 1;
+                    }
+
+                    if (this._field[i, j - 1] == value)
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (this._field[i, j - 1] == value)
+                {
+                    if (this._field[i, j - 2] == value)
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return 0;       //No Matches
+
+        }
+
+        void RemoveMatch(List<Match> match)
+        {
+            for(int i = 0; i < match.Count; i++)
+            {
+                
+
+
             }
 
 
-            Console.Clear();
-            Console.WriteLine(alltext[15] + "\n Press Any key");
-            Console.ReadKey();
-            Console.Clear();
-            main_menu(alltext, state);
-            return 1; //game over
         }
 
-        static void game_over_sequence()
-        {
-            //check double tap on gameover sequence
-        }
-
-        static void tetris(string[] args)
-        {
-            //all text menu divided by pieces
-            string[] alltext =
-                { "\n##########W E L C O M E         T O         T E T R I S !##########", //0
-                "\n###########H I G H                           S C O R E S###########", //1
-                "\nEnter player name: ", //2 
-                "\nPlayer: ", //3
-                "\n(H)Show highscores ", //4 
-                "\n(Q)Quit Tetris ", //5
-                "\nAre you sure(Y/N)?", //6
-                "\nChoose difficulty:\n(1)Easy\n(2)Medium\n(3)Hard,", //7
-                "\nChoose field size:\n(1)Little\n(2)Medium\n(3)Big", //8
-                "\nPlayer                                                        Score", //9
-                "", //10
-                "\n(Backspace)Back", //11
-                "\n(Esc)Back to the main menu", //12
-                "\n(S)Start new game: ", //13
-                @"    _________  _______  _________  ________  ___  ________      " + "\n" + @"   |\___   ___\\  ___ \|\___   ___\\   __  \|\  \|\   ____\     " + "\n" +
-                @"   \|___ \  \_\ \   __/\|___ \  \_\ \  \|\  \ \  \ \  \___|_    " +"\n" + @"        \ \  \ \ \  \_|/__  \ \  \ \ \   _  _\ \  \ \_____  \   " +
-                "\n" + @"         \ \  \ \ \  \_|\ \  \ \  \ \ \  \\  \\ \  \|____|\  \  " + "\n" + @"          \ \__\ \ \_______\  \ \__\ \ \__\\ _\\ \__\____\_\  \ " +
-                "\n" + @"           \|__|  \|_______|   \|__|  \|__|\|__|\|__|\_________\"+"\n"+ @"                                                    \|_________|",   //14
-                @" ________  ________  _____ ______   _______          " + "\n" + @"|\   ____\|\   __  \|\   _ \  _   \|\  ___ \         " + "\n" +
-                @"\ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|        " + "\n" + @" \ \  \  __\ \   __  \ \  \\|__| \  \ \  \_|/__      " + "\n" +
-                @"  \ \  \|\  \ \  \ \  \ \  \    \ \  \ \  \_|\ \     " +"\n" +@"   \ \_______\ \__\ \__\ \__\    \ \__\ \_______\    " + "\n" +
-                @"    \|_______|\|__|\|__|\|__|     \|__|\|_______|    " +"\n" +@" ________  ___      ___ _______   ________           " + "\n" +
-                @"|\   __  \|\  \    /  /|\  ___ \ |\   __  \          " + "\n" +@"\ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \         " +"\n" +
-                @" \ \  \\\  \ \  \/  / / \ \  \_|/_\ \   _  _\        " +"\n" +@"  \ \  \\\  \ \    / /   \ \  \_|\ \ \  \\  \|       " +"\n" +
-                @"   \ \_______\ \__/ /     \ \_______\ \__\\ _\       " + "\n" +@"    \|_______|\|__|/       \|_______|\|__|\|__|      "       //15
-                };
-            int state = 0;
-
-            Console.WriteLine(alltext[14] + "\n Press Any key");
-            Console.ReadKey();
-            Console.Clear();
-            //main menu - 1) 0 2    2)0 3 10 13 4 5 
-            //start menu - 1) 0 7 11   2)0 8 11
-            //quit menu - 1) 0 6
-            //high scores 1) 0 1 9 %highscores%
-
-            main_menu(alltext, state);
-            //high_score();
-            //string player_name = string.Empty;
-            //game(15,20, player_name);
-            return;
-        }
 
     }
 

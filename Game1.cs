@@ -161,23 +161,23 @@ namespace Match3Classic
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    this.sprites.Add(new Sprite(textures[grid._graph._fieldMatrix[i,j]])
+                    this.sprites.Add(new Sprite(textures[grid._field[i,j]])
                     {
                         _positionInit = new Vector2(
-                            sprites[2]._position2D.X + i * deltaField + i * textures[grid._graph._fieldMatrix[i, j]].Width + textures[grid._graph._fieldMatrix[i, j]].Width/2,
-                            sprites[2]._position2D.Y + j * deltaField + j * textures[grid._graph._fieldMatrix[i, j]].Height + textures[grid._graph._fieldMatrix[i, j]].Height / 2 + deltaField
+                            sprites[2]._position2D.X + i * deltaField + i * textures[grid._field[i, j]].Width + textures[grid._field[i, j]].Width/2,
+                            sprites[2]._position2D.Y + j * deltaField + j * textures[grid._field[i, j]].Height + textures[grid._field[i, j]].Height / 2 + deltaField
                             ),
 
                         _position2D = new Vector2           //в конструктор из positionInit
                         (
-                            sprites[2]._position2D.X + i * deltaField + i * textures[grid._graph._fieldMatrix[i, j]].Width + textures[grid._graph._fieldMatrix[i, j]].Width / 2,
-                            sprites[2]._position2D.Y + j * deltaField + j * textures[grid._graph._fieldMatrix[i, j]].Height + textures[grid._graph._fieldMatrix[i, j]].Height / 2 + deltaField
+                            sprites[2]._position2D.X + i * deltaField + i * textures[grid._field[i, j]].Width + textures[grid._field[i,j]].Width / 2,
+                            sprites[2]._position2D.Y + j * deltaField + j * textures[grid._field[i, j]].Height + textures[grid._field[i, j]].Height / 2 + deltaField
                         ),
 
                         _origin = new Vector2
                             (
-                            textures[grid._graph._fieldMatrix[i, j]].Width / 2,
-                            textures[grid._graph._fieldMatrix[i, j]].Height / 2
+                            textures[grid._field[i, j]].Width / 2,
+                            textures[grid._field[i, j]].Height / 2
                             ),
 
                         Input = new Input()

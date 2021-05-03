@@ -15,18 +15,22 @@ namespace Match3Classic
         //public int x_coord, y_coord;
         const int SHAPE_QUANTITY = 5, SHAPE_SIZE = 4;
 
-        private enum ShapeType
+        public enum ShapeType
         {
             Circle = 3,
             Heart = 4,
             Rectangle = 5,
             Star = 6,
-            Star2 = 7
+            Star2 = 7,
+            LineVert = 8,
+            LineHor = 9,
+            Bomb = 10,
+            Nothing = 11
         }
 
         int center, shape_type;
 
-        ShapeType shapeType;
+        public ShapeType shapeType;
         public struct shape_block
         {
             public int x_coord;
@@ -58,10 +62,9 @@ namespace Match3Classic
         public int ShapeCreate()
         {
             ShapeType[] shapes = ((ShapeType[]) Enum.GetValues(typeof(ShapeType)));
-            this.shapeType = shapes[new Random().Next(0, shapes.Length)];
-            //check if 10-15% 
-            //Console.WriteLine(shapeType.ToString());
+            this.shapeType = shapes[new Random().Next(0, shapes.Length - 3)];
             return (int)shapeType;
+
         }
 
 
