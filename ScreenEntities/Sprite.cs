@@ -30,7 +30,9 @@ public class Sprite
         RotationSoFar = 0f;
     
     public float Scale = 1f;
-    
+
+    const int stateByTime = 10;
+
     public bool 
         isDragged, isRotating;
     public Input Input;
@@ -46,6 +48,7 @@ public class Sprite
         this.WindowSize[1] = WindowHeight;
         this._texture2D = texture;
         this._textureset2D = new Texture2D[1];
+        this._textureset2D[0] = texture;
         this.maxstates = 1;             //for immovable objects
 	}
 
@@ -55,7 +58,8 @@ public class Sprite
         this.WindowSize[0] = WindowWidth;
         this.WindowSize[1] = WindowHeight;
         this._textureset2D = textureset;
-        this.maxstates = textureset.Length - 1;
+        this._texture2D = textureset[0];
+        this.maxstates = textureset.Length - 3;
     }
 
     public ButtonState LeftButton { get; }
@@ -113,15 +117,17 @@ public class Sprite
 
             if (this.isDragged == true)
             {
-                this._position2D = mousePosition;
+                //this._position2D = mousePosition;
                 this._rotation += MathHelper.ToRadians(RotationSpeed);
-                this.state = (this.state + 1) % maxstates;
+
+                this.state = this.state + 1; //% maxstates;
 
                 if (currentMouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed)
                 {
                     this._rotation = 0f;
                     this.isRotating = false;
                     this._position2D = this._positionInit;
+                    this.state = 0;
                     this.isDragged = false;
                 }
 
@@ -154,7 +160,15 @@ public class Sprite
         if (CheckIfTarget() == 0)
             return;
 
-        this._texture2D = _textureset2D[state];
+        this._texture2D = this._textureset2D[(state / stateByTime) % maxstates];
+    }
+
+    public void Update()
+    {
+        this._texture2D = _textureset2D[(state / stateByTime) % maxstates];
+
+        if (CheckIfTarget() == 0)
+            return;
     }
 
     public void Update(Texture2D texture)

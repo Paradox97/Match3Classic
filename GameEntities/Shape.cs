@@ -17,29 +17,29 @@ namespace Match3Classic
 
         public enum ShapeType
         {
-            Circle = 3,     //Green
+            Square = 3,     //Green
             Heart = 4,      //Purple
-            Rectangle = 5,  //Red
-            Star = 6,       //Blue  
-            Star2 = 7,      //Yellow
+            Sphere = 5,  //Red
+            Pyramid = 6,       //Blue  
+            Crystall = 7,      //Yellow
 
-            LineHorGreen = 8,
-            LineHorPurple = 9,
-            LineHorRed = 10,
-            LineHorBlue = 11,
-            LineHorYellow = 12,
+            LineHorSquare = 8,
+            LineHorHeart = 9,
+            LineHorSphere = 10,
+            LineHorPyramid = 11,
+            LineHorCrystall = 12,
 
-            LineVertGreen = 13,
-            LineVertPurple = 14,
-            LineVertRed = 15,
-            LineVertBlue = 16,
-            LineVertYellow = 17,
+            LineVertSquare = 13,
+            LineVertHeart = 14,
+            LineVertSphere = 15,
+            LineVertPyramid = 16,
+            LineVertCrystall = 17,
 
-            BombGreen = 18,
-            BombPurple = 19,
-            BombRed = 20,
-            BombBlue = 21,
-            BombYellow = 22,
+            BombSquare = 18,
+            BombHeart = 19,
+            BombSphere = 20,
+            BombPyramid = 21,
+            BombCrystall = 22,
 
             Nothing = 23
         }

@@ -17,13 +17,13 @@ namespace Match3Classic
         Shape shape;
         Field grid;
         public GameTime gametime;
-        
-        public char[,] field 
-        { 
-            get; set; 
+
+        public char[,] field
+        {
+            get; set;
         }
 
-        public TimeSpan TotalGameTime { 
+        public TimeSpan TotalGameTime {
             get;
             set;
         }
@@ -33,7 +33,7 @@ namespace Match3Classic
 
         public struct TextureList
         {
-            List<Texture2D> textures;
+            public List<Texture2D> textures;
 
             public TextureList(List<Texture2D> textures)
             {
@@ -41,7 +41,11 @@ namespace Match3Classic
             }
         }
 
-        private List<TextureList> _texturelist;
+        private TextureList[] _texturelist;
+
+        public Texture2D[] texturelist;
+
+        public Texture2D[][] _CountArray;
 
         private Screen screen;
 
@@ -71,7 +75,7 @@ namespace Match3Classic
             shape = new Shape(grid);
             //grid.Render();
             this.screen = new Screen();
-
+            //this._CountArray = new Texture2D[5][];
 
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -82,8 +86,8 @@ namespace Match3Classic
         {
             // TODO: Add your initialization logic here
             //gametime = new GameTime();
-            _graphics.PreferredBackBufferWidth = 1024;  // set this value to the desired width of your window
-            _graphics.PreferredBackBufferHeight = 600;   // set this value to the desired height of your window
+            _graphics.PreferredBackBufferWidth = 455;  // set this value to the desired width of your window
+            _graphics.PreferredBackBufferHeight = 650;   // set this value to the desired height of your window
             base.Initialize();
         }
 
@@ -92,16 +96,20 @@ namespace Match3Classic
             _graphics.ApplyChanges();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            List<Texture2D> temp = new List<Texture2D>();
+            this._CountArray = new Texture2D[6][];
 
             this.textures = new List<Texture2D>();
-            this._texturelist = new List<TextureList>();
 
             textures.Add(Content.Load<Texture2D>("img/text/match 3"));      //0
             textures.Add(Content.Load<Texture2D>("img/text/classic_resize"));   //1
             textures.Add(Content.Load<Texture2D>("img/fields/field2")); //2
 
-            this._texturelist.Add(new TextureList(textures));
+            this.texturelist = new Texture2D[43];
+
+            this.texturelist[0] = Content.Load<Texture2D>("img/text/match 3");
+            this.texturelist[1] = Content.Load<Texture2D>("img/text/classic_resize");
+            this.texturelist[2] = Content.Load<Texture2D>("img/fields/field2");
+
 
             //Initial Textures
             textures.Add(Content.Load<Texture2D>("img/figures/квадрат/квадратек")); //3         
@@ -110,76 +118,98 @@ namespace Match3Classic
             textures.Add(Content.Load<Texture2D>("img/figures/пирамида/перамидка")); //6
             textures.Add(Content.Load<Texture2D>("img/figures/кристалл/кристаллек"));  //7
 
+
             //Texture States
-            //квадрат 0
-            temp.Add(Content.Load<Texture2D>("img/figures/квадрат/сияние квадратек 1")); //0
-            temp.Add(Content.Load<Texture2D>("img/figures/квадрат/сияние квадратек 2")); //1
-            temp.Add(Content.Load<Texture2D>("img/figures/квадрат/сияние квадратек 3")); //2
+            //квадрат 1
 
-            temp.Add(Content.Load<Texture2D>("img/figures/квадрат/стрелка квадратек вбок")); //3
-            temp.Add(Content.Load<Texture2D>("img/figures/квадрат/стрелка кавдратек вверх")); //4
-            temp.Add(Content.Load<Texture2D>("img/figures/квадрат/бомба квадратек")); //5
+            this._CountArray[0] = new Texture2D[7] {
+            Content.Load<Texture2D>("img/figures/квадрат/квадратек"),
+            Content.Load<Texture2D>("img/figures/квадрат/сияние квадратек 1"),
+            Content.Load<Texture2D>("img/figures/квадрат/сияние квадратек 2"),
+            Content.Load<Texture2D>("img/figures/квадрат/сияние квадратек 3"),
+            Content.Load<Texture2D>("img/figures/квадрат/стрелка квадратек вбок"),
+            Content.Load<Texture2D>("img/figures/квадрат/стрелка кавдратек вверх"),
+            Content.Load<Texture2D>("img/figures/квадрат/бомба квадратек")
+            };
 
-            temp = new List<Texture2D>();
-            //сердце 1
-            temp.Add(Content.Load<Texture2D>("img/figures/сердце/сияние пердечко 1")); //0
-            temp.Add(Content.Load<Texture2D>("img/figures/сердце/сияние пердечко 2")); //1
-            temp.Add(Content.Load<Texture2D>("img/figures/сердце/сияние пердечко 3")); //2
+            //сердце 2
 
-            temp.Add(Content.Load<Texture2D>("img/figures/сердце/стрелка сердечко вбок")); //3
-            temp.Add(Content.Load<Texture2D>("img/figures/сердце/стрелка сердечко вверх")); //4
-            temp.Add(Content.Load<Texture2D>("img/figures/сердце/бомба пердечко")); //5
+            this._CountArray[1] = new Texture2D[7]{
+            Content.Load<Texture2D>("img/figures/сердце/пердечко"),
+            Content.Load<Texture2D>("img/figures/сердце/сияние пердечко 1"),
+            Content.Load<Texture2D>("img/figures/сердце/сияние пердечко 2"),
+            Content.Load<Texture2D>("img/figures/сердце/сияние пердечко 3"),
+            Content.Load<Texture2D>("img/figures/сердце/стрелка сердечко вбок"),
+            Content.Load<Texture2D>("img/figures/сердце/стрелка сердечко вверх"),
+            Content.Load<Texture2D>("img/figures/сердце/бомба пердечко")
+            };
 
-            temp = new List<Texture2D>();
+            //this._CountArray[1] = Temp;
             //шар 2
-            temp.Add(Content.Load<Texture2D>("img/figures/шар/сияние шарек 1")); //0
-            temp.Add(Content.Load<Texture2D>("img/figures/шар/сияние шарек 2")); //1
-            temp.Add(Content.Load<Texture2D>("img/figures/шар/сияние шарек 3")); //2
+            this._CountArray[2] = new Texture2D[7] {
+            Content.Load<Texture2D>("img/figures/шар/шарек"),
+            Content.Load<Texture2D>("img/figures/шар/сияние шарек 1"),
+            Content.Load<Texture2D>("img/figures/шар/сияние шарек 2"),
+            Content.Load<Texture2D>("img/figures/шар/сияние шарек 3"),
+            Content.Load<Texture2D>("img/figures/шар/стрелка шарек вбок"),
+            Content.Load<Texture2D>("img/figures/шар/стрелка шарек вверх"),
+            Content.Load<Texture2D>("img/figures/шар/бомба шарек")
+            };
 
-            temp.Add(Content.Load<Texture2D>("img/figures/шар/стрелка шарек вбок")); //3
-            temp.Add(Content.Load<Texture2D>("img/figures/шар/стрелка шарек вверх")); //4
-            temp.Add(Content.Load<Texture2D>("img/figures/шар/бомба шарек")); //5
-
-            temp = new List<Texture2D>();
             //пирамида 3
-            temp.Add(Content.Load<Texture2D>("img/figures/пирамида/сияние перамидка 1")); //0
-            temp.Add(Content.Load<Texture2D>("img/figures/пирамида/сияние перамидка 2")); //1
-            temp.Add(Content.Load<Texture2D>("img/figures/пирамида/сияние перамидка 3")); //2
 
-            temp.Add(Content.Load<Texture2D>("img/figures/пирамида/стрелка пирамидка вбок")); //3
-            temp.Add(Content.Load<Texture2D>("img/figures/пирамида/стрелка пирамидка вверх")); //4
-            temp.Add(Content.Load<Texture2D>("img/figures/пирамида/бомба перамидка")); //5
-
-            temp = new List<Texture2D>();
+            this._CountArray[3] = new Texture2D[7] {
+            Content.Load<Texture2D>("img/figures/пирамида/перамидка"),
+            Content.Load<Texture2D>("img/figures/пирамида/сияние перамидка 1"),
+            Content.Load<Texture2D>("img/figures/пирамида/сияние перамидка 2"),
+            Content.Load<Texture2D>("img/figures/пирамида/сияние перамидка 3"),
+            Content.Load<Texture2D>("img/figures/пирамида/стрелка пирамидка вбок"),
+            Content.Load<Texture2D>("img/figures/пирамида/стрелка пирамидка вверх"),
+            Content.Load<Texture2D>("img/figures/пирамида/бомба перамидка")
+            };
             //кристалл 4
-            temp.Add(Content.Load<Texture2D>("img/figures/кристалл/кристалл сияние 1")); //31
-            temp.Add(Content.Load<Texture2D>("img/figures/кристалл/кристалл сияние 2")); //32
-            temp.Add(Content.Load<Texture2D>("img/figures/кристалл/кристалл сияние 3 ")); //33
 
-            temp.Add(Content.Load<Texture2D>("img/figures/кристалл/стрелка кристаллек вбок")); //34
-            temp.Add(Content.Load<Texture2D>("img/figures/кристалл/стрелка кристаллек вверх")); //35
-            temp.Add(Content.Load<Texture2D>("img/figures/кристалл/бомба кресталлек")); //36
-
-            temp = new List<Texture2D>();
+            this._CountArray[4] = new Texture2D[7] {
+            Content.Load<Texture2D>("img/figures/кристалл/кристаллек"),
+            Content.Load<Texture2D>("img/figures/кристалл/кристалл сияние 1"),
+            Content.Load<Texture2D>("img/figures/кристалл/кристалл сияние 2"),
+            Content.Load<Texture2D>("img/figures/кристалл/кристалл сияние 3 "),
+            Content.Load<Texture2D>("img/figures/кристалл/стрелка кристаллек вбок"),
+            Content.Load<Texture2D>("img/figures/кристалл/стрелка кристаллек вверх"),
+            Content.Load<Texture2D>("img/figures/кристалл/бомба кресталлек")
+            };
             //эффекты 
-            temp.Add(Content.Load<Texture2D>("img/fx/нитро вверх")); //8
-            temp.Add(Content.Load<Texture2D>("img/fx/нитро вниз")); //9
-            temp.Add(Content.Load<Texture2D>("img/fx/нитро лево")); //10
-            temp.Add(Content.Load<Texture2D>("img/fx/нитро право")); //11
-            temp.Add(Content.Load<Texture2D>("img/fx/огонек")); //12
-
-            temp = new List<Texture2D>();
+            this._CountArray[5] = new Texture2D[5] {
+            Content.Load<Texture2D>("img/fx/нитро вверх"),
+            Content.Load<Texture2D>("img/fx/нитро вниз"),
+            Content.Load<Texture2D>("img/fx/нитро лево"),
+            Content.Load<Texture2D>("img/fx/нитро право"),
+            Content.Load<Texture2D>("img/fx/огонек")
+            };
 
             float deltaField = 5f;
 
             //float[] logoLocation = new float[2] {1f,0f};
             float [] logoLocation = this.screen.GetLogoLocation(Window, textures[0]);
             //_texture2D = Content.Load<Texture2D>("img/match 3");
+            
+            Texture2D[] logolist = new Texture2D[3];
+            logolist[0] = this.texturelist[0];
+            logolist[1] = this.texturelist[1];
+            logolist[2] = this.texturelist[2];
 
+
+
+            /*
+            for (int k = 0; k < 8; k++)
+            {
+                texturelist[] = 
+            }
+            */
 
             //logos
             this.sprites = new List<Sprite>() {
-                new Sprite(textures[0], Window.ClientBounds.Width, Window.ClientBounds.Height)
+                new Sprite(logolist[0], Window.ClientBounds.Width, Window.ClientBounds.Height)
                 {
                    /* _origin = new Vector2
                     (
@@ -194,7 +224,7 @@ namespace Match3Classic
                     )
                 }
                 ,
-                new Sprite(textures[1], Window.ClientBounds.Width, Window.ClientBounds.Height)
+                new Sprite(logolist[1], Window.ClientBounds.Width, Window.ClientBounds.Height)
                 {
                     /*
                     _origin = new Vector2
@@ -205,21 +235,35 @@ namespace Match3Classic
                     */
                     _position2D = new Vector2
                     (
-                        logoLocation[0]+textures[0].Width-textures[1].Width,
-                        0+textures[0].Height
+                        logoLocation[0]+logolist[0].Width-logolist[1].Width,
+                        0+logolist[0].Height
                     )
                 },
-                new Sprite(textures[2], Window.ClientBounds.Width, Window.ClientBounds.Height)
+                new Sprite(logolist[2], Window.ClientBounds.Width, Window.ClientBounds.Height)
                 {
                     _position2D = new Vector2
                     (
                         5, 
-                        0+textures[0].Height+textures[1].Height
+                        0+logolist[0].Height+logolist[1].Height
                     )
                 }   
             };
 
+
+            //new Sprite(this.texturelist[grid._field[i,j] - 3]
+
+            Texture2D[] CountArray = new Texture2D[40];
+
+            Texture2D[][] _CountArray = new Texture2D[5][];
+
+            int length = this.texturelist.Length;
+
+            int k = 0;
+
+            //new Sprite(this._CountArray[i-3]
+
             //figures
+            /*
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -251,9 +295,44 @@ namespace Match3Classic
 
                             }
                         });
-                }
+                }this._CountArray[grid._field[(i-3) % 8, (i-3) / 8] - 3
              }
-    
+            */
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    this.sprites.Add(new Sprite(this._CountArray[grid._field[i, j] - 3], Window.ClientBounds.Width, Window.ClientBounds.Height)
+                    {
+                        _positionInit = new Vector2(
+                            sprites[2]._position2D.X + i * deltaField + i * TEXTURE_SIZE + TEXTURE_SIZE / 2 + deltaField,
+                            sprites[2]._position2D.Y + j * deltaField + j * TEXTURE_SIZE + TEXTURE_SIZE / 2 + deltaField
+                            ),
+
+                        _position2D = new Vector2           //в конструктор из positionInit
+                        (
+                            sprites[2]._position2D.X + i * deltaField + i * TEXTURE_SIZE + TEXTURE_SIZE / 2 + deltaField,
+                            sprites[2]._position2D.Y + j * deltaField + j * TEXTURE_SIZE + TEXTURE_SIZE / 2 + deltaField
+                        ),
+
+                        _origin = new Vector2
+                            (
+                            TEXTURE_SIZE / 2,
+                            TEXTURE_SIZE / 2
+                            ),
+
+                        Input = new Input()
+                        {
+                        },
+                        MouseInput = new MouseInput()
+                        {
+
+                        }
+                    });
+                }
+            }
+
+
 
             // TODO: use this.Content to load your game content here
         }
@@ -270,7 +349,9 @@ namespace Match3Classic
 
             for (int i = 3; i < sprites.Count; i++)
             {
-                sprites[i].Update(textures[grid._field[(i-3) % 8, (i-3)/8]]);
+                //sprites[i].Update(textures[grid._field[(i-3) % 8, (i-3)/8]]);
+                //sprites[i].Update(this._CountArray[grid._field[(i-3) % 8, (i-3) / 8] - 3]);
+                sprites[i].Update();
             }
 
             base.Draw(gameTime);
