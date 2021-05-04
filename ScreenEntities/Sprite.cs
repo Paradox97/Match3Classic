@@ -27,9 +27,14 @@ public class Sprite
     public Input Input;
     public MouseInput MouseInput;
 
+    public float[] WindowSize;
+
     MouseState lastMouseState, currentMouseState;
-    public Sprite(Texture2D texture)
+    public Sprite(Texture2D texture, float WindowWidth, float WindowHeight)
 	{
+        this.WindowSize = new float[2];
+        this.WindowSize[0] = WindowWidth; 
+        this.WindowSize[1] = WindowHeight;
         this._texture2D = texture;
 	}
 
@@ -127,6 +132,8 @@ public class Sprite
 	public void Update()
     {
         CheckIfTarget();
+        
+        
         //Move();
 
         //var newState = Keyboard.GetPres;
@@ -154,44 +161,34 @@ public class Sprite
 
     private void Move()
     {
-        //if (Input == null)
-          //  return;
-
-        if (Keyboard.GetState().IsKeyDown(this.Input.Up))
-        {
-            // if (this._position2D.Y > 0)
-            // {
-            this._position2D.Y -= this.MoveSpeed;
-            // }
-        }
 
         if (Keyboard.GetState().IsKeyDown(this.Input.Down))
         {
-            //  if (this._position2D.X > 0)
-            // {
             this._position2D.Y += this.MoveSpeed;
-            // }
         }
 
         if (Keyboard.GetState().IsKeyDown(this.Input.Left))
         {
-            //if (this._position2D.X > 0)
-            // {
             this._position2D.X -= this.MoveSpeed;
-            // }
-
         }
 
         if (Keyboard.GetState().IsKeyDown(this.Input.Right))
         {
-            //if (this._position2D.X > 0)
-            // {
             this._position2D.X += this.MoveSpeed;
-            // }
         }
 
     }
 
+    public void Drop()
+    {
+        //while ()
+       // {
+
+       // }
+
+
+
+    }
 	public void Draw(SpriteBatch _spriteBatch)
     {
         _spriteBatch.Draw(

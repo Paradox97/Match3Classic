@@ -160,6 +160,7 @@ namespace Match3Classic
 
             string output = string.Empty;
 
+            /*
           
             for (int i = 0; i < FIELD_SIZE; i++)
             {
@@ -177,44 +178,7 @@ namespace Match3Classic
             Console.WriteLine(IfMatch(0, 0));
 
             Console.Write(output);
-
-        }
-        public void CheckMatch(int i, int j)
-        {
-            int[,] temp = new int[FIELD_SIZE, FIELD_SIZE];
-            int value = this._field[i, j];
-
-            if (value == 11)
-                return;
-
-            List<Match> hor_match = new List<Match>();
-            List<Match> vert_match = new List<Match>();
-            List<Match> all_matches = new List<Match>();
-
-            if ((i + 2 < FIELD_SIZE) && (this._field[i + 1, j] == value) && (this._field[i + 2, j] == value))
-            {
-                hor_match.Add(new Match(i, j));
-                hor_match.Add(new Match(i + 1, j));
-                hor_match.Add(new Match(i + 2, j));
-            }
-        
-
-
-            if (j + 2 < FIELD_SIZE)
-            {
-                if ((this._field[i, j + 1] == value) && (this._field[i, j + 2] == value))
-                {
-                    vert_match.Add(new Match(i, j));
-                    vert_match.Add(new Match(i, j + 1));
-                    vert_match.Add(new Match(i, j + 2));
-
-
-
-
-                }
-
-            }
-
+            */
         }
 
         public void Shuffle(int i, int j)
@@ -233,15 +197,15 @@ namespace Match3Classic
             {
                 foreach (Match m in matches)
                 {
-                       // if ((m.i + 1 < FIELD_SIZE) && (this._field[m.i + 1, m.j] != value))
-                       // {
-                        //    Swap(m.i, m.j, m.i + 1, m.j);
-                      //  }
-                      //  else
+                     //   if ((m.i + 1 < FIELD_SIZE) && (this._field[m.i + 1, m.j] != value))
+                     //   {
+                      //     Swap(m.i, m.j, m.i + 1, m.j);
+                     //   }
+                     //   else
                       //  if ((m.j + 1 < FIELD_SIZE) && (this._field[m.i, m.j + 1] != value))
                       //  {
                       //      Swap(m.i, m.j, m.i, m.j + 1);
-                      //  }
+                     //  }
                      //   else
                      //   {
                             notmatch = shape.ShapeCreate();
@@ -250,7 +214,7 @@ namespace Match3Classic
                                     notmatch = shape.ShapeCreate();
                                 }
                             this._field[m.i, m.j] = notmatch;
-                      //  }
+                     //   }
                     
                 }
             }
@@ -265,7 +229,7 @@ namespace Match3Classic
         {
             int temp = this._field[i1,j1];
             this._field[i1, j1] = this._field[i2, j2];
-            this._field[i2, j2] = this._field[i1, j1];
+            this._field[i2, j2] = temp;
         }
 
         public void GenerateByDifficulty(int difficulty_seed)

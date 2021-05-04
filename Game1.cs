@@ -101,7 +101,7 @@ namespace Match3Classic
 
 
             this.sprites = new List<Sprite>() {
-                new Sprite(textures[0])
+                new Sprite(textures[0], Window.ClientBounds.Width, Window.ClientBounds.Height)
                 {
                    /* _origin = new Vector2
                     (
@@ -113,17 +113,10 @@ namespace Match3Classic
                     (
                        logoLocation[0],
                        logoLocation[1]
-                    ),
-                    Input = new Input()
-                    {
-                        Up = Keys.W,
-                        Down = Keys.S,
-                        Left = Keys.A,
-                        Right = Keys.D
-                    }
+                    )
                 }
                 ,
-                new Sprite(textures[1])
+                new Sprite(textures[1], Window.ClientBounds.Width, Window.ClientBounds.Height)
                 {
                     /*
                     _origin = new Vector2
@@ -136,23 +129,15 @@ namespace Match3Classic
                     (
                         logoLocation[0]+textures[0].Width-textures[1].Width,
                         0+textures[0].Height
-                    ),
-
-                    Input = new Input()
-                    {
-                    }
+                    )
                 },
-                new Sprite(textures[2])
+                new Sprite(textures[2], Window.ClientBounds.Width, Window.ClientBounds.Height)
                 {
                     _position2D = new Vector2
                     (
                         10, 
                         0+textures[0].Height+textures[1].Height
-                    ),
-
-                    Input = new Input()
-                    {
-                    }
+                    )
                 }   
             };
 
@@ -161,7 +146,7 @@ namespace Match3Classic
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    this.sprites.Add(new Sprite(textures[grid._field[i,j]])
+                    this.sprites.Add(new Sprite(textures[grid._field[i,j]], Window.ClientBounds.Width, Window.ClientBounds.Height)
                     {
                         _positionInit = new Vector2(
                             sprites[2]._position2D.X + i * deltaField + i * textures[grid._field[i, j]].Width + textures[grid._field[i, j]].Width/2,
@@ -202,31 +187,14 @@ namespace Match3Classic
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            //if (Mouse.GetState.)
-            //Keyboard keyboard = Keyboard.GetState();
-            /*switch (key)
-            {
-                case (key.W)
-
-            }*/
 
             foreach (var sprite in this.sprites)
                 sprite.Update();
-             //for (int i = 0; i < this.sprites.Count; i++) {
-              //  this.sprites[i].Update();
-             // }
-         
 
-            //sprite1.Update();
-
-            // TODO: Add your update logic here
             base.Draw(gameTime);
             base.Update(gameTime);
-            //Debug.WriteLine("Time", gametime.TotalGameTime.TotalSeconds);
-            //System.Threading.Thread.Sleep(500);
         }
 
         protected override void Draw(GameTime gameTime)
