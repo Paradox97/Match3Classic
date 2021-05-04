@@ -6,12 +6,46 @@
   <SourceFiles>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fields/field1.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fields/field2.png</File>
-    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Circle.png</File>
-    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Heart.png</File>
-    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Nothing.png</File>
-    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Rectangle.png</File>
-    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Star.png</File>
-    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/Star2.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/бомба квадратек.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/квадратек.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/сияние квадратек 1.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/сияние квадратек 2.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/сияние квадратек 3.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/стрелка кавдратек вверх.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/квадрат/стрелка квадратек вбок.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/бомба кресталлек.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/кристалл сияние 1.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/кристалл сияние 2.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/кристалл сияние 3 .png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/кристаллек.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/стрелка кристаллек вбок.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/кристалл/стрелка кристаллек вверх.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/бомба перамидка.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/перамидка.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/сияние перамидка 1.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/сияние перамидка 2.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/сияние перамидка 3.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/стрелка пирамидка вбок.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/пирамида/стрелка пирамидка вверх.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/бомба пердечко.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/пердечко.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/сияние пердечко 1.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/сияние пердечко 2.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/сияние пердечко 3.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/стрелка сердечко вбок.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/сердце/стрелка сердечко вверх.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/бомба шарек.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/сияние шарек 1.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/сияние шарек 2.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/сияние шарек 3.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/стрелка шарек вбок.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/стрелка шарек вверх.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/figures/шар/шарек.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fx/нитро вверх.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fx/нитро вниз.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fx/нитро лево.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fx/нитро право.png</File>
+    <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/fx/огонек.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/text/classic.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/text/classic_resize.png</File>
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/text/gameover.png</File>
@@ -26,6 +60,40 @@
     <File>C:/Users/Пека/source/repos/Match3Classic/Match3Classic/Content/img/text/Yes.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

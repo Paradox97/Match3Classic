@@ -15,10 +15,16 @@ namespace Match3Classic
     public class Field
     {
         Shape shape;
-        const int FIELD_SIZE = 8,
+        public const int FIELD_SIZE = 8,
             FIELDSIZE = 64,
             PROXIMITY_DISTANCE = 2,
-            MATCH_CONDITION = 3;
+            MATCH_CONDITION = 3,
+            LINE_BONUS = 4,
+            BOMB_BONUS = 5,
+            OFFSET = 5;
+           // BOMB_OFFSET = 3,
+           // HOR_LINE_OFFSET = 1,
+           // VERT_LINE_OFFSET = 2;
 
         public int
             width, height,
@@ -26,6 +32,10 @@ namespace Match3Classic
             start_x, start_y,
             score, period;
 
+
+        
+
+        Bonuses _bonus;
 
 
         public bool
@@ -71,47 +81,30 @@ namespace Match3Classic
 
         }
 
+        public struct Bonus
+        {
+            public int i;
+            public int j;
+            public int value;           //0 - none, 1 - LineHor, 2 - line Vert, 3 - bomb
+
+            public Bonus(int i, int j, int value)
+            {
+                this.i = i;
+                this.j = j;
+                this.value = value;
+            }
+
+        }
+
+
+
         public List<Match> _match;
         public Match _horizontalMatch;
         public Match _verticalMatch;
 
         public List<text_menu> text_menus;
 
-        public Field(int width, int height, int start_x, int start_y, int block_size, int difficulty, string player_name) //user defined field constructor 
-        {
-            this.height = height;
-            this.width = width;
-            this.start_x = start_x;
-            this.start_y = start_y;
-            this.block_size = block_size;
-            this.player_name = player_name;
-            this.period = 150;  //from constructor
-
-            switch (difficulty)
-            {
-                case 1:
-                    this.period = 150;
-                    break;
-                case 2:
-                    this.period = 120;
-                    break;
-                case 3:
-                    this.period = 90;
-                    break;
-            }
-
-            this.area = new char[width, height];
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    this.area[i, j] = ' ';
-                }
-            }
-        }
-
-        public void FieldCreate(Shape shape, int[,] delta)
+        public void FieldCreate(Shape shape)
         {
 
             for (var i = 0; i < FIELD_SIZE; i++)
@@ -132,7 +125,7 @@ namespace Match3Classic
                 }
             }
 
-            
+
             //this._field[0, 0] = 4;
 
             //check if 10-15% 
@@ -146,39 +139,422 @@ namespace Match3Classic
         {
             this._match = new List<Match>();
             this.shape = new Shape();
+            this._bonus = new Bonuses();
 
             this._field = new int[FIELD_SIZE, FIELD_SIZE];
 
-            FieldCreate(shape, this._field);
+            FieldCreate(shape);
         }
 
 
-        public void Render()
+        public float[] userInput(int i1, int j1, int i2, int j2)
         {
-            Console.SetCursorPosition(0, 0);
-            //FieldCreate(shape);
+            float[] values = new float[4];
 
-            string output = string.Empty;
-
-            /*
-          
-            for (int i = 0; i < FIELD_SIZE; i++)
+            if (IfMatch(i2, j2) == 0)
             {
-                for (int j = 0; j < FIELD_SIZE; j++)
+                for (int i = 0; i < 4; i++)
                 {
-                   // this.start_finding = 1;
-                   // this._match.Add(new Match(i, j, true));
-                   // BFS(i, j, _field[i, j], 0, this._match);    //check matches
-                    output += this._field[j, i];
-                    output += ' ';
+                    values[i] = -1;
                 }
-                output += "|\n";
+                return values;
+            }
+            Swap(i1, j1, i2, j2);       //swap successfull
+
+            if (IfMatch(i1, j1) == 1)
+            {
+                DoBlast(i1, j1);
+                DoBlast(i2, j2);
+
+                values[0] = i2;
+                values[1] = j2;
+                values[2] = i1;
+                values[3] = j1;
+            }
+            else
+            {
+                DoBlast(i2, j2);
+
+                values[0] = i2;
+                values[1] = j2;
+                values[2] = -1;     //"empty" entry
+                values[3] = -1;
             }
 
-            Console.WriteLine(IfMatch(0, 0));
 
-            Console.Write(output);
-            */
+            return values;
+        }
+
+        public List<Bonus> BlastHorLine(int i, int j)
+        {
+            List<Bonus> ToBlast = new List<Bonus>();
+
+            List<Bonus> Temp = new List<Bonus>();
+
+            int value = 1;
+
+            ToBlast.Add(new Bonus(i,j, value));
+
+            for (int k = 0; k < FIELD_SIZE; k++)
+            {
+                if ((this._field[k, j] >= 8) || (this._field[k, j] < 13))       //horizontal line bonus
+                {
+                    Temp = BlastHorLine(k, j);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[k, j] >= 13) || (this._field[k, j] < 18))      //vert line bonus
+                {
+                    Temp = BlastVertLine(k, j);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[k, j] >= 18) || (this._field[k, j] < 23))      //bomb bonus
+                {
+                    Temp = BlastBomb(k, j);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                this._field[k, j] = 23;
+            }
+
+            List<Bonus> NoDupes = ToBlast.Distinct().ToList();
+
+            return NoDupes;
+        }
+
+        public List<Bonus> BlastVertLine(int i, int j)
+        {
+            int value = 2;
+
+            List<Bonus> ToBlast = new List<Bonus>();
+
+            List<Bonus> Temp = new List<Bonus>();
+
+            ToBlast.Add(new Bonus(i, j, value));
+
+            for (int k = 0; k < FIELD_SIZE; k++)
+            {
+                if ((this._field[i, k] >= 8) || (this._field[i, k] < 13))       //horizontal line bonus
+                {
+                    Temp = BlastHorLine(i, k);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[i, k] >= 13) || (this._field[i, k] < 18))      //vert line bonus
+                {
+                    Temp = BlastVertLine(i, k);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[i, k] >= 18) || (this._field[i, k] < 23))      //bomb bonus
+                {
+                    Temp = BlastBomb(i, k);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                this._field[i, k] = 23;
+            }
+
+            List<Bonus> NoDupes = ToBlast.Distinct().ToList();
+
+            return NoDupes;
+
+        }
+
+        public List<Bonus> BlastBomb(int i, int j)
+        {
+            int value = 3;
+
+            List<Match> BombBlast = new List<Match>();
+
+            List<Bonus> ToBlast = new List<Bonus>();
+
+            List<Bonus> Temp = new List<Bonus>();
+
+            ToBlast.Add(new Bonus(i, j, value));
+
+            if (i - 1 > 0)
+            {
+                if (j - 1 > 0)
+                {
+                    BombBlast.Add(new Match(i - 1, j - 1));
+                }
+                if (j + 1 < FIELD_SIZE)
+                {
+                    BombBlast.Add(new Match(i - 1, j + 1));
+                }
+                BombBlast.Add(new Match(i - 1, j));
+            }
+
+            if (i + 1 > 0)
+            {
+                if (j - 1 > 0)
+                {
+                    BombBlast.Add(new Match(i + 1, j - 1));
+                }
+                if (j + 1 < FIELD_SIZE)
+                {
+                    BombBlast.Add(new Match(i + 1, j + 1));
+                }
+                BombBlast.Add(new Match(i + 1, j));
+            }
+
+            if (j - 1 > 0)
+            {
+                BombBlast.Add(new Match(i, j - 1));
+            }
+            if (j + 1 < FIELD_SIZE)
+            {
+                BombBlast.Add(new Match(i, j + 1));
+            }
+            BombBlast.Add(new Match(i, j));
+
+            int c, z;
+
+            for (int k = 0; k < BombBlast.Count; k++)
+            {
+                c = BombBlast[k].i;
+                z = BombBlast[k].j;
+
+                if ((this._field[c, z] >= 8) || (this._field[c, z] < 13))       //horizontal line bonus
+                {
+                    Temp = BlastHorLine(c, z);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[c, z] >= 13) || (this._field[c, z] < 18))      //vert line bonus
+                {
+                    Temp = BlastVertLine(c, z);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[c, z] >= 18) || (this._field[c, z] < 23))      //bomb bonus
+                {
+                    Temp = BlastBomb(c, z);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                this._field[c, z] = 23;
+            }
+
+
+            List<Bonus> NoDupes = ToBlast.Distinct().ToList();
+            
+
+            return NoDupes;
+        }
+
+        public void SpawnHorLine(int i, int j, int value)
+        {
+            this._field[i, j] = GetHorLineValue(value);
+        }
+
+        public void SpawnVertLine(int i, int j, int value)
+        {
+            this._field[i, j] = GetVertLineValue(value);
+        }
+
+        public void SpawnBomb(int i, int j, int value)
+        {
+            this._field[i, j] = GetBombValue(value);
+        }
+
+        public int GetHorLineValue(int value)
+        {
+            return value + OFFSET;
+        }
+
+        public int GetBombValue(int value)
+        {
+            return value + OFFSET * 3;
+        }
+
+        public int GetVertLineValue(int value)
+        {
+            return value + OFFSET * 2;
+        }
+
+        /*
+        LineVertGreen = 8,      
+            LineVertPurple = 9,
+            LineVertRed = 10,
+            LineVertBlue = 11,
+            LineVertYellow = 12,
+
+            LineHorGreen = 13,
+            LineHorPurple = 14,
+            LineHorRed = 15,
+            LineHorBlue = 16,
+            LineHorYellow = 17,
+
+            BombGreen = 18,
+            BombPurple = 19,
+            BombRed = 20,
+            BombBlue = 21,
+            BombYellow = 22,
+
+            Nothing = 23      
+        */
+
+        public int blast(int i, int j)
+        {
+
+
+            return 1;
+        }
+
+        public List<Bonus> DoBlast(int i, int j)            //0 - just blast, 1 - hor line blast, 2 - vert line blast, 3 - bomb blast
+        {
+            List<Match> match = new List<Match>();
+
+            List<Bonus> toprocede = new List<Bonus>();
+
+            List<Bonus> temp = new List<Bonus>();
+
+            match = WhereMatch(i, j);
+
+            int value = this._field[match[0].i, match[0].j];
+
+            int toWhere = match.Count - 1;
+            int BonusType = 0;
+
+
+
+            List<Bonus> Bonuses = new List<Bonus>();
+
+            if (match[match.Count - 1].i > FIELD_SIZE)
+            {
+                toWhere = match.Count;          //Bonus present
+                BonusType = match[match.Count - 1].i;
+            }
+
+
+            int c, z;
+
+            for (int m = 0; m < toWhere; m++)
+            {
+                c = match[m].i;
+                z = match[m].j;
+                
+                if ((this._field[c, z] >= 8) || (this._field[c, z] < 13))       //horizontal line bonus
+                {
+                    temp = BlastHorLine(c, z);
+
+                    for (int p = 0; p < temp.Count; p++)
+                    {
+                        toprocede.Add(new Bonus(temp[m].i, temp[m].j, temp[m].value));
+                    }
+
+                    temp = new List<Bonus>();
+                }
+
+                if ((this._field[c, z] >= 13) || (this._field[c, z] < 18))      //vert line bonus
+                {
+                    temp = BlastVertLine(c, z);
+
+                    for (int p = 0; p < temp.Count; p++)
+                    {
+                        toprocede.Add(new Bonus(temp[m].i, temp[m].j, temp[m].value));
+                    }
+
+                    temp = new List<Bonus>(); 
+                }
+
+                if ((this._field[c, z] >= 18) || (this._field[c, z] < 23))      //bomb bonus
+                {
+                    temp = BlastVertLine(c, z);
+
+                    for (int p = 0; p < temp.Count; p++)
+                    {
+                        toprocede.Add(new Bonus(temp[m].i, temp[m].j, temp[m].value));
+                    }
+
+                    temp = new List<Bonus>();
+                }
+            }
+
+            switch (BonusType)
+            {
+                case 444:
+                    SpawnHorLine(i, j, this._field[i, j]);
+                    break;
+                case 555:
+                    SpawnVertLine(i, j, this._field[i, j]);
+                    break;
+                case 666:
+                    SpawnBomb(i, j, this._field[i, j]);
+                    break;
+                case 0:
+                    break;
+            }
+
+            Bonuses = toprocede.Distinct().ToList();
+            return Bonuses;
+        }
+
+        public void DoBlast(int i1, int j1, int i2, int j2)
+        {
+            List<Match> match1 = new List<Match>();
+            match1 = WhereMatch(i1, j1);
+
+            List<Match> match2 = new List<Match>();
+            match2 = WhereMatch(i2, j2);
+
         }
 
         public void Shuffle(int i, int j)
@@ -195,31 +571,19 @@ namespace Match3Classic
 
             while (IfMatch(i, j) == 1)
             {
-                foreach (Match m in matches)
-                {
-                     //   if ((m.i + 1 < FIELD_SIZE) && (this._field[m.i + 1, m.j] != value))
-                     //   {
-                      //     Swap(m.i, m.j, m.i + 1, m.j);
-                     //   }
-                     //   else
-                      //  if ((m.j + 1 < FIELD_SIZE) && (this._field[m.i, m.j + 1] != value))
-                      //  {
-                      //      Swap(m.i, m.j, m.i, m.j + 1);
-                     //  }
-                     //   else
-                     //   {
+                for (int m = 0; m < matches.Count - 1; m++) {       //without bonuses
+
                             notmatch = shape.ShapeCreate();
                             while (notmatch == value)
                                 {
                                     notmatch = shape.ShapeCreate();
                                 }
-                            this._field[m.i, m.j] = notmatch;
-                     //   }
-                    
+                            this._field[matches[m].i, matches[m].j] = notmatch;   
+
                 }
             }
 
-            Render();
+            //Render();
 
 
 
@@ -360,25 +724,42 @@ namespace Match3Classic
         {
             int value = this._field[i, j];
 
+            int[] bonus_values = new int[3];
+
+            bonus_values[0] = GetHorLineValue(value);
+            bonus_values[1] = GetVertLineValue(value);
+            bonus_values[2] = GetBombValue(value);
+
 
             List<Match> Match = new List<Match>();
 
             List<Match> Temp = new List<Match>();
+
+            Match Bonus = new Match();
+
+            List<Match> MatchTypeHor = new List<Match>();
+            List<Match> MatchTypeVert = new List<Match>();
+
+            int BombIndex = 666;
+            int horizontalIndex = 444;
+            int verticalIndex = 555;
 
 
             if (i < FIELD_SIZE)
             {
                for (int k = i; k < FIELD_SIZE; k++)
                 {
-                    if (this._field[k, j] == value)
+                    if ((this._field[k, j] == value) || (this._field[k, j] == bonus_values[0]) || (this._field[k, j] == bonus_values[1]) || (this._field[k, j] == bonus_values[2]))
                         Temp.Add(new Match(k, j));
                     else break;
                 }
-               if (Temp.Count >= MATCH_CONDITION)
+
+                foreach (Match m in Temp)
                 {
-                    foreach (Match m in Temp)
-                        Match.Add(m);
+                    Match.Add(m);
+                    MatchTypeHor.Add(m);
                 }
+
                 Temp = new List<Match>();
             }
 
@@ -386,15 +767,17 @@ namespace Match3Classic
             {
                 for (int k = j; k < FIELD_SIZE; k++)
                 {
-                    if (this._field[i, k] == value)
+                    if ((this._field[i, k] == value) || (this._field[i, k] == bonus_values[0]) || (this._field[i, k] == bonus_values[1]) || (this._field[i, k] == bonus_values[2]))
                         Temp.Add(new Match(i, k));
                     else break;
                 }
-                if (Temp.Count >= MATCH_CONDITION)
+
+                foreach (Match m in Temp)
                 {
-                    foreach (Match m in Temp)
-                        Match.Add(m);
+                    Match.Add(m);
+                    MatchTypeVert.Add(m);
                 }
+
                 Temp = new List<Match>();
             }
             
@@ -402,15 +785,17 @@ namespace Match3Classic
             {
                 for (int k = i; k > 0; k--)
                 {
-                    if (this._field[k, j] == value)
+                    if ((this._field[k, j] == value) || (this._field[k, j] == bonus_values[0]) || (this._field[k, j] == bonus_values[1]) || (this._field[k, j] == bonus_values[2]))
                         Temp.Add(new Match(k, j));
                     else break;
                 }
-                if (Temp.Count >= MATCH_CONDITION)
+
+                foreach (Match m in Temp)
                 {
-                    foreach (Match m in Temp)
-                        Match.Add(m);
+                    Match.Add(m);
+                    MatchTypeHor.Add(m);
                 }
+
                 Temp = new List<Match>();
             }
 
@@ -418,21 +803,52 @@ namespace Match3Classic
             {
                 for (int k = j; k > 0; k--)
                 {
-                    if (this._field[i, k] == value)
+                    if ((this._field[i, k] == value) || (this._field[i, k] == bonus_values[0]) || (this._field[i, k] == bonus_values[1]) || (this._field[i, k] == bonus_values[2]))
                         Temp.Add(new Match(i, k));
                     else break;
                 }
-                if (Temp.Count >= MATCH_CONDITION)
+
+                foreach (Match m in Temp)
                 {
-                    foreach (Match m in Temp)
-                        Match.Add(m);
+                    Match.Add(m);
+                    MatchTypeVert.Add(m);
                 }
+
                 Temp = new List<Match>();
             }
 
+            List<Match> NoDuplicatesHor = MatchTypeHor.Distinct().ToList();
+            List<Match> NoDuplicatesVert = MatchTypeVert.Distinct().ToList();
             List<Match> NoDuplicates = Match.Distinct().ToList();
 
-            return Match;
+            if (NoDuplicatesHor.Count >= BOMB_BONUS)
+            {                                               //addding info about bonuses
+                Bonus = new Match(BombIndex, BombIndex);
+                NoDuplicates.Add(Bonus);
+                return NoDuplicates;
+            }
+
+            if (NoDuplicatesVert.Count >= BOMB_BONUS)
+            {
+                Bonus = new Match(BombIndex, BombIndex);
+                NoDuplicates.Add(Bonus);
+                return NoDuplicates;
+            }
+
+            if ((NoDuplicatesVert.Count >= LINE_BONUS) || (NoDuplicatesHor.Count >= LINE_BONUS))
+            {
+                if (NoDuplicatesVert.Count > NoDuplicatesHor.Count)
+                {
+                    Bonus = new Match(verticalIndex, verticalIndex);
+                }
+                else
+                    Bonus = new Match(horizontalIndex, horizontalIndex);
+
+                NoDuplicates.Add(Bonus);
+                return NoDuplicates;
+            }
+
+            return NoDuplicates;
         }
 
 
@@ -440,19 +856,27 @@ namespace Match3Classic
         {
             int value = this._field[i, j];
 
-            if (value == 11)
+            if (value == 23)
                 return 0;
 
+            int[] bonus_values = new int[3];
+
+            bonus_values[0] = GetHorLineValue(value);
+            bonus_values[1] = GetVertLineValue(value);
+            bonus_values[2] = GetBombValue(value);
+
+
+
             try
             {
-                if(this._field[i + 1, j] == value)
+                if ((this._field[i + 1, j] == value) || (this._field[i + 1, j] == bonus_values[0]) || (this._field[i + 1, j]  == bonus_values[1]) || (this._field[i + 1, j] == bonus_values[2])) 
                 {
-                    if (this._field[i + 2, j] == value)
+                    if ((this._field[i + 2, j] == value) || (this._field[i + 2, j] == bonus_values[0]) || (this._field[i + 2, j] == bonus_values[1]) || (this._field[i + 2, j] == bonus_values[2])) 
                     {
                         return 1;
                     }
 
-                    if (this._field[i - 1, j] == value)
+                    if ((this._field[i - 1, j] == value) || (this._field[i - 1, j] == bonus_values[0]) || (this._field[i - 1, j] == bonus_values[1]) || (this._field[i - 1, j] == bonus_values[2])) 
                     {
                         return 1;
                     }
@@ -464,9 +888,9 @@ namespace Match3Classic
 
             try
             {
-                if (this._field[i - 1, j] == value)
+                if ((this._field[i - 1, j] == value) || (this._field[i - 1, j] == bonus_values[0]) || (this._field[i - 1, j] == bonus_values[1]) || (this._field[i - 1, j] == bonus_values[2])) 
                 {
-                    if (this._field[i - 2, j] == value)
+                    if ((this._field[i - 2, j] == value) || (this._field[i - 2, j] == bonus_values[0]) || (this._field[i - 2, j] == bonus_values[1]) || (this._field[i - 2, j] == bonus_values[2])) 
                     {
                         return 1;
                     }
@@ -478,14 +902,14 @@ namespace Match3Classic
 
             try
             {
-                if (this._field[i, j + 1] == value)
+                if ((this._field[i, j + 1] == value) || (this._field[i, j + 1] == bonus_values[0]) || (this._field[i, j + 1] == bonus_values[1]) || (this._field[i, j + 1] == bonus_values[2])) 
                 {
-                    if (this._field[i, j + 2] == value)
+                    if((this._field[i, j + 2] == value) || (this._field[i, j + 2] == bonus_values[0]) || (this._field[i, j + 2] == bonus_values[1]) || (this._field[i, j + 2] == bonus_values[2])) 
                     {
                         return 1;
                     }
 
-                    if (this._field[i, j - 1] == value)
+                    if ((this._field[i, j - 1] == value) || (this._field[i, j - 1] == bonus_values[0]) || (this._field[i, j - 1] == bonus_values[1]) || (this._field[i, j - 1] == bonus_values[2])) 
                     {
                         return 1;
                     }
@@ -497,9 +921,9 @@ namespace Match3Classic
 
             try
             {
-                if (this._field[i, j - 1] == value)
+                if ((this._field[i, j - 1] == value) || (this._field[i, j - 1] == bonus_values[0]) || (this._field[i, j - 1] == bonus_values[1]) || (this._field[i, j - 1] == bonus_values[2])) 
                 {
-                    if (this._field[i, j - 2] == value)
+                    if ((this._field[i, j - 2] == value) || (this._field[i, j - 2] == bonus_values[0]) || (this._field[i, j - 2] == bonus_values[1]) || (this._field[i, j - 2] == bonus_values[2])) 
                     {
                         return 1;
                     }

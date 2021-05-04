@@ -12,6 +12,15 @@ public class Sprite
 		private set;
 	}
 
+    public Texture2D[] _textureset2D
+    {
+        get;
+        private set;
+    }
+
+    public int state;
+    public int maxstates;
+
 	public Vector2 _position2D;
     public Vector2 _origin;
     public Vector2 _positionInit;
@@ -36,10 +45,21 @@ public class Sprite
         this.WindowSize[0] = WindowWidth; 
         this.WindowSize[1] = WindowHeight;
         this._texture2D = texture;
+        this._textureset2D = new Texture2D[1];
+        this.maxstates = 1;             //for immovable objects
 	}
 
+    public Sprite(Texture2D[] textureset, float WindowWidth, float WindowHeight)
+    {
+        this.WindowSize = new float[2];
+        this.WindowSize[0] = WindowWidth;
+        this.WindowSize[1] = WindowHeight;
+        this._textureset2D = textureset;
+        this.maxstates = textureset.Length - 1;
+    }
+
     public ButtonState LeftButton { get; }
-    public void CheckIfTarget()
+    public int CheckIfTarget()
     {
         if (this.MouseInput != null)
         {
@@ -55,22 +75,6 @@ public class Sprite
 
             Vector2 mousePosition = new Vector2(currentMouseState.X, currentMouseState.Y);
 
-            /*
-            if (currentMouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
-            {
-                if (
-                    ((this._position2D.X + hitBoxDelta.X <= mousePosition.X))
-                    &&
-                    ((this._position2D.X + this._texture2D.Width - hitBoxDelta.X >= mousePosition.X))
-                    &&
-                    ((this._position2D.Y + hitBoxDelta.Y <= mousePosition.Y))
-                    &&
-                    ((this._position2D.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
-                   )
-                    this.isDragged = true;
-
-
-            }*/
 
             if (currentMouseState.LeftButton == ButtonState.Pressed && lastMouseState.LeftButton == ButtonState.Released)
             {
@@ -83,12 +87,13 @@ public class Sprite
                     &&
                     ((this._position2D.Y - this._origin.Y + this._texture2D.Height - hitBoxDelta.Y >= mousePosition.Y))
                    )
+                {
                     this.isDragged = true;
-
-
+                    this.isRotating = true;
+                }
             }
 
-
+            /*
             if (currentMouseState.RightButton == ButtonState.Pressed && lastMouseState.RightButton == ButtonState.Released)
             {
                 if (
@@ -104,18 +109,25 @@ public class Sprite
 
 
             }
-
+            */
 
             if (this.isDragged == true)
             {
                 this._position2D = mousePosition;
+                this._rotation += MathHelper.ToRadians(RotationSpeed);
+                this.state = (this.state + 1) % maxstates;
+
                 if (currentMouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed)
                 {
+                    this._rotation = 0f;
+                    this.isRotating = false;
                     this._position2D = this._positionInit;
                     this.isDragged = false;
                 }
+
             }
 
+            /*
             if (this.isRotating == true)
             {
                 this._rotation += MathHelper.ToRadians(RotationSpeed);
@@ -126,37 +138,33 @@ public class Sprite
                     this.isRotating = false;
                 }
             }
+            */
         }
+        return 0;
     }
 
-	public void Update()
+    public void Falldown()
     {
-        CheckIfTarget();
-        
-        
-        //Move();
 
-        //var newState = Keyboard.GetPres;
-        
-        /*Keyboard key = Keyboard.GetState();
-        
+    }
+	public void Update(Texture2D[] textureset)
+    {
+        this._textureset2D = textureset;
 
-        switch (key)
-        {
-            case (Keys.W):
-                this._position2D.Y -= Speed;
-                break;
-            case (Keys.S):
-                this._position2D.Y -= Speed;
-                break;
-            case (Keys.A):
-                this._position2D.Y -= Speed;
-                break;
-            case (Keys.D):
-                this._position2D.Y -= Speed;
-                break;
-        }*/
-        
+        if (CheckIfTarget() == 0)
+            return;
+
+        this._texture2D = _textureset2D[state];
+    }
+
+    public void Update(Texture2D texture)
+    {
+        this._texture2D = texture;
+
+        if (CheckIfTarget() == 0)
+            return;
+
+        //this._texture2D = _textureset2D[state];
     }
 
     private void Move()
@@ -179,16 +187,6 @@ public class Sprite
 
     }
 
-    public void Drop()
-    {
-        //while ()
-       // {
-
-       // }
-
-
-
-    }
 	public void Draw(SpriteBatch _spriteBatch)
     {
         _spriteBatch.Draw(

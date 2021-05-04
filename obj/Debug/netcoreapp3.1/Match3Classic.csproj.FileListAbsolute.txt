@@ -33,11 +33,6 @@ C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\Start.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\Yes.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\classic_resize.xnb
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\Circle.xnb
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\Heart.xnb
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\Rectangle.xnb
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\Star.xnb
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\Star2.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\classic.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\classic_resize.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\gameover.xnb
@@ -52,4 +47,43 @@ C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\text\Yes.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fields\field1.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fields\field2.xnb
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\Nothing.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\бомба квадратек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\квадратек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\сияние квадратек 1.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\сияние квадратек 2.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\сияние квадратек 3.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\стрелка кавдратек вверх.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\квадрат\стрелка квадратек вбок.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\бомба кресталлек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\кристалл сияние 1.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\кристалл сияние 2.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\кристалл сияние 3 .xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\кристаллек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\стрелка кристаллек вбок.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\кристалл\стрелка кристаллек вверх.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\бомба перамидка.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\перамидка.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\сияние перамидка 1.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\сияние перамидка 2.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\сияние перамидка 3.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\стрелка пирамидка вбок.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\пирамида\стрелка пирамидка вверх.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\бомба пердечко.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\пердечко.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\сияние пердечко 1.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\сияние пердечко 2.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\сияние пердечко 3.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\стрелка сердечко вбок.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\сердце\стрелка сердечко вверх.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\бомба шарек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\сияние шарек 1.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\сияние шарек 2.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\сияние шарек 3.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\стрелка шарек вбок.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\стрелка шарек вверх.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\figures\шар\шарек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\нитро вверх.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\нитро вниз.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\нитро лево.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\нитро право.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\огонек.xnb
