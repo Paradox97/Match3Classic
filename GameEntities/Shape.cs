@@ -17,15 +17,33 @@ namespace Match3Classic
 
         public enum ShapeType
         {
-            Circle = 3,
-            Heart = 4,
-            Rectangle = 5,
-            Star = 6,
-            Star2 = 7,
-            LineVert = 8,
-            LineHor = 9,
-            Bomb = 10,
-            Nothing = 11
+            Circle = 3,     //Green
+            Heart = 4,      //Purple
+            Rectangle = 5,  //Red
+            Star = 6,       //Blue  
+            Star2 = 7,      //Yellow
+
+            LineVertGreen = 8,      
+            LineVertPurple = 9,
+            LineVertRed = 10,
+            LineVertBlue = 11,
+            LineVertYellow = 12,
+            DestroyerVert = 13,
+
+            LineHorGreen = 14,
+            LineHorPurple = 15,
+            LineHorRed = 16,
+            LineHorBlue = 17,
+            LineHorYellow = 18,
+            DestroyerHor = 19,
+
+            BombGreen = 20,
+            BombPurple = 21,
+            BombRed = 22,
+            BombBlue = 23,
+            BombYellow = 24,
+
+            Nothing = 25        
         }
 
         int center, shape_type;
@@ -62,7 +80,7 @@ namespace Match3Classic
         public int ShapeCreate()
         {
             ShapeType[] shapes = ((ShapeType[]) Enum.GetValues(typeof(ShapeType)));
-            this.shapeType = shapes[new Random().Next(0, shapes.Length - 3)];
+            this.shapeType = shapes[new Random().Next(0, shapes.Length - 18)];      //18 - number of unspawnable objects
             return (int)shapeType;
 
         }

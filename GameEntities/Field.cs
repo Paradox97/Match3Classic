@@ -118,11 +118,22 @@ namespace Match3Classic
             {
                 for (var j = 0; j < FIELD_SIZE; j++)
                 {
-                    this._field[i, j] = 6;
+                    this._field[i, j] = shape.ShapeCreate();
                 }
             }
 
-            this._field[0, 0] = 4;
+            GenerateByDifficulty(1);
+
+            for (var i = 0; i < FIELD_SIZE; i++)
+            {
+                for (var j = 0; j < FIELD_SIZE; j++)
+                {
+                    Shuffle(i, j);
+                }
+            }
+
+            
+            //this._field[0, 0] = 4;
 
             //check if 10-15% 
             //Console.WriteLine(shapeType.ToString());
@@ -154,7 +165,7 @@ namespace Match3Classic
             {
                 for (int j = 0; j < FIELD_SIZE; j++)
                 {
-                    this.start_finding = 1;
+                   // this.start_finding = 1;
                    // this._match.Add(new Match(i, j, true));
                    // BFS(i, j, _field[i, j], 0, this._match);    //check matches
                     output += this._field[j, i];
@@ -168,155 +179,6 @@ namespace Match3Classic
             Console.Write(output);
 
         }
-
-        /*
-        public void BFS(int i, int j, int value, int MatchType, List<Match> matches)
-        {
-            if (value == 11)
-                return;
-
-            int k = i;
-            int z = j;
-            bool isvisited;
-
-            List<Match> Temp = new List<Match>();
-
-            if (this.start_finding == 1)
-            {
-                this.start_finding = 0;
-
-                if ((k + 1 < FIELD_SIZE) && (_field[k + 1, z] == value) )    //horizontal match - right 
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k + 1, z, true));
-                    BFS(k + 1, z, value, 0, Temp);
-                }
-
-                if ((k - 1 > 0) && (_field[k - 1, z] == value))         //horizontal match - left
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k - 1, z, true));
-                    BFS(k - 1, z, value, 0, Temp);
-                }
-
-                if ((z + 1 < FIELD_SIZE) && (_field[k, z + 1] == value))        //vertical match - down
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k, z + 1, true));
-                    BFS(k, z + 1, value, 0, Temp);
-                }
-
-                if ((z - 1 > 0) && (_field[k, z - 1] == value))         //vertical match - up
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k, z - 1, true));
-                    BFS(k, z - 1, value, 0, Temp);
-                }
-            }
-
-            if (MatchType == 0)   //horizontal match
-            {
-
-                if ((k + 1 < FIELD_SIZE) && (_field[k + 1, z] == value) && (IsVisited(matches, k + 1, z) == 1))    //horizontal match - right  if not visited
-                {
-                   
-                    Temp = matches;
-                    Temp.Add(new Match(k + 1, z, true));
-                    BFS(k + 1, z, value, 0, Temp);
-                }
-
-                if ((k - 1 > 0) && (_field[k - 1, z] == value) && (IsVisited(matches, k - 1, z) == 1))         //horizontal match - left
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k - 1, z, true));
-                    BFS(k - 1, z, value, 0, Temp);
-                }
-
-                if ((z + 1 < FIELD_SIZE) && (_field[k, z + 1] == value) && (IsVisited(matches, k, z + 1) == 1))        //vertical match - down
-                {
-                    Temp.Add(new Match(k, z, true));
-                    Temp.Add(new Match(k, z + 1, true));
-                    BFS(k, z + 1, value, 1, Temp);
-                }
-
-                if ((z - 1 > 0) && (_field[k, z - 1] == value) && (IsVisited(matches, k, z - 1) == 1))         //vertical match - up
-                {
-                    Temp.Add(new Match(k, z, true));
-                    Temp.Add(new Match(k, z - 1, true));
-                    BFS(k, z - 1, value, 1, Temp);
-                }
-
-                if (Temp.Count >= MATCH_CONDITION)
-                {
-                    for (int m = 0; m < Temp.Count; m++)
-                    {
-                        matches.Add(Temp[m]);
-                    }
-                    this._match = matches;
-                }
-            }
-
-
-            if (MatchType == 1)     //vertical match
-            {
-
-                if ((k + 1 < FIELD_SIZE) && (_field[k + 1, z] == value) && (IsVisited(matches, k + 1, z) == 1))    //horizontal match - right 
-                {
-                    Temp.Add(new Match(k, z, true));
-                    Temp.Add(new Match(k + 1, z, true));
-                    BFS(k + 1, z, value, 0, Temp);
-                }
-
-                if ((k - 1 > 0) && (_field[k - 1, z] == value) && (IsVisited(matches, k - 1, z) == 1))         //horizontal match - left
-                {
-                    Temp.Add(new Match(k, z, true));
-                    Temp.Add(new Match(k - 1, z, true));
-                    BFS(k - 1, z, value, 0, Temp);
-                }
-
-                if ((z + 1 < FIELD_SIZE) && (_field[k, z + 1] == value) && (IsVisited(matches, k, z + 1) == 1))        //vertical match - down
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k, z + 1, true));
-                    BFS(k, z + 1, value, 1, Temp);
-                }
-
-                if ((z - 1 > 0) && (_field[k, z - 1] == value) && (IsVisited(matches, k, z - 1) == 1))         //vertical match - up
-                {
-                    Temp = matches;
-                    Temp.Add(new Match(k, z - 1, true));
-                    BFS(k, z - 1, value, 1, Temp);
-                }
-
-                if (Temp.Count >= MATCH_CONDITION)
-                {
-                    for (int m = 0; m < Temp.Count; m++)
-                    {
-                        matches.Add(Temp[m]);
-                    }
-                    this._match = matches;
-                }
-            }
-        }
-        */
-
-        /*
-
-        public int IsVisited(List<Match> matches, int i, int j)
-        {
-            for (int m = 0; m < matches.Count; m++)
-            {
-                if ((matches[m].i == i) && (matches[m].j == j))
-                {
-                    if (matches[m].isVisited == true)
-                        return 0;
-                    else
-                        return 1;
-                }
-            }
-            return -1;
-        }*/
-
         public void CheckMatch(int i, int j)
         {
             int[,] temp = new int[FIELD_SIZE, FIELD_SIZE];
@@ -354,6 +216,261 @@ namespace Match3Classic
             }
 
         }
+
+        public void Shuffle(int i, int j)
+        {
+            if (IfMatch(i, j) == 0)
+                return;
+
+            List<Match> matches = new List<Match>();
+
+            int notmatch;
+            int value = this._field[i, j];
+            matches = WhereMatch(i, j);
+
+
+            while (IfMatch(i, j) == 1)
+            {
+                foreach (Match m in matches)
+                {
+                       // if ((m.i + 1 < FIELD_SIZE) && (this._field[m.i + 1, m.j] != value))
+                       // {
+                        //    Swap(m.i, m.j, m.i + 1, m.j);
+                      //  }
+                      //  else
+                      //  if ((m.j + 1 < FIELD_SIZE) && (this._field[m.i, m.j + 1] != value))
+                      //  {
+                      //      Swap(m.i, m.j, m.i, m.j + 1);
+                      //  }
+                     //   else
+                     //   {
+                            notmatch = shape.ShapeCreate();
+                            while (notmatch == value)
+                                {
+                                    notmatch = shape.ShapeCreate();
+                                }
+                            this._field[m.i, m.j] = notmatch;
+                      //  }
+                    
+                }
+            }
+
+            Render();
+
+
+
+        }
+
+        public void Swap(int i1, int j1, int i2, int j2)
+        {
+            int temp = this._field[i1,j1];
+            this._field[i1, j1] = this._field[i2, j2];
+            this._field[i2, j2] = this._field[i1, j1];
+        }
+
+        public void GenerateByDifficulty(int difficulty_seed)
+        {
+            Random _random = new Random();
+
+            int Steps, Seed; 
+            int i, j;   //indices of field
+
+            //const int min = 5, max = 7;
+
+            switch (difficulty_seed)
+            {
+                case 1:
+                    Steps = _random.Next(5, 7);
+
+                    Console.WriteLine(Steps);
+
+                    for (int k = 0; k < Steps; k++)
+                    {
+                        i = _random.Next(0, FIELD_SIZE - 1);
+                        j = _random.Next(0, FIELD_SIZE - 1);
+                        Seed = _random.Next(0, 3);
+                        Generate(i, j, Seed);
+                    }
+                    break;
+                case 2:
+                    Steps = _random.Next(3, 5);
+
+                    for (int k = 0; k < Steps; k++)
+                    {
+                        i = _random.Next(0, FIELD_SIZE - 1);
+                        j = _random.Next(0, FIELD_SIZE - 1);
+                        Seed = _random.Next(0, 3);
+                        Generate(i, j, Seed);
+                    }
+
+                    break;
+                case 3:
+                    Steps = _random.Next(2, 4);
+
+                    for (int k = 0; k < Steps; k++)
+                    {
+                        i = _random.Next(0, FIELD_SIZE - 1);
+                        j = _random.Next(0, FIELD_SIZE - 1);
+                        Seed = _random.Next(0, 3);
+                        Generate(i, j, Seed);
+                    }
+
+                    break;
+            }
+
+
+
+
+        }
+
+        public void Generate(int i, int j, int seed)
+        {
+            int value = this._field[i, j];
+
+            if (value == 11)
+                return;
+
+            Console.WriteLine(i.ToString()+ " |||| " + j.ToString());
+
+            switch (seed)
+            {
+                case 0:
+                    try
+                    {
+                        if (i + 2 < FIELD_SIZE)
+                            this._field[i + 2, j] = value;
+                        this._field[i + 1, j] = value;
+
+                        if (i - 1 > 0)
+                            this._field[i - 1, j] = value;
+                    }
+                    catch
+                    {
+
+                    }
+                        break;
+                case 1:
+                    try
+                    {
+                        this._field[i - 1, j] = value;
+                        this._field[i - 2, j] = value;
+                    }
+                    catch
+                    {
+                    }
+                    break;
+
+                case 2:
+                    try
+                    {
+                        if (i + 2 < FIELD_SIZE)
+                            this._field[i, j + 1] = value;
+                        this._field[i, j + 2] = value;
+                        if (j - 1 > 0)
+                            this._field[i, j - 1] = value;
+                    }
+                    catch
+                    {
+                    }
+                    break;
+
+                case 3:
+                    try
+                    {
+                        this._field[i, j - 1] = value;
+                        this._field[i, j - 2] = value;
+                    }
+                    catch
+                    {
+                    }
+                    break;
+            }
+           
+
+
+
+            return;
+        }
+
+        public List<Match> WhereMatch(int i, int j)
+        {
+            int value = this._field[i, j];
+
+
+            List<Match> Match = new List<Match>();
+
+            List<Match> Temp = new List<Match>();
+
+
+            if (i < FIELD_SIZE)
+            {
+               for (int k = i; k < FIELD_SIZE; k++)
+                {
+                    if (this._field[k, j] == value)
+                        Temp.Add(new Match(k, j));
+                    else break;
+                }
+               if (Temp.Count >= MATCH_CONDITION)
+                {
+                    foreach (Match m in Temp)
+                        Match.Add(m);
+                }
+                Temp = new List<Match>();
+            }
+
+            if(j < FIELD_SIZE)
+            {
+                for (int k = j; k < FIELD_SIZE; k++)
+                {
+                    if (this._field[i, k] == value)
+                        Temp.Add(new Match(i, k));
+                    else break;
+                }
+                if (Temp.Count >= MATCH_CONDITION)
+                {
+                    foreach (Match m in Temp)
+                        Match.Add(m);
+                }
+                Temp = new List<Match>();
+            }
+            
+            if (i > 0)
+            {
+                for (int k = i; k > 0; k--)
+                {
+                    if (this._field[k, j] == value)
+                        Temp.Add(new Match(k, j));
+                    else break;
+                }
+                if (Temp.Count >= MATCH_CONDITION)
+                {
+                    foreach (Match m in Temp)
+                        Match.Add(m);
+                }
+                Temp = new List<Match>();
+            }
+
+            if (j > 0)
+            {
+                for (int k = j; k > 0; k--)
+                {
+                    if (this._field[i, k] == value)
+                        Temp.Add(new Match(i, k));
+                    else break;
+                }
+                if (Temp.Count >= MATCH_CONDITION)
+                {
+                    foreach (Match m in Temp)
+                        Match.Add(m);
+                }
+                Temp = new List<Match>();
+            }
+
+            List<Match> NoDuplicates = Match.Distinct().ToList();
+
+            return Match;
+        }
+
 
         public int IfMatch(int i, int j)
         {
@@ -432,17 +549,6 @@ namespace Match3Classic
 
         }
 
-        void RemoveMatch(List<Match> match)
-        {
-            for(int i = 0; i < match.Count; i++)
-            {
-                
-
-
-            }
-
-
-        }
 
 
     }
