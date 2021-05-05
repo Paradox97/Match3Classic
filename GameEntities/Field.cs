@@ -10,21 +10,43 @@ using System.IO;
 using System.Collections.Generic;
 
 
-namespace Tetris
+namespace Match3Classic
 {
     public class Field
     {
+        Shape shape;
+        public const int FIELD_SIZE = 8,
+            FIELDSIZE = 64,
+            PROXIMITY_DISTANCE = 2,
+            MATCH_CONDITION = 3,
+            LINE_BONUS = 4,
+            BOMB_BONUS = 5,
+            OFFSET = 5;
+           // BOMB_OFFSET = 3,
+           // HOR_LINE_OFFSET = 1,
+           // VERT_LINE_OFFSET = 2;
+
         public int
             width, height,
             block_size,
             start_x, start_y,
             score, period;
 
+
+        
+
+        Bonuses _bonus;
+
+
         public bool
             gameover,
             exit, pause;
 
+        public float percentPreMatch;
+
         public char[,] area;
+
+        public int[,] _field;
 
         string player_name;
 
@@ -41,432 +63,881 @@ namespace Tetris
 
         }
 
+        public int start_finding = 0;
+
+
+        public struct Match
+        {
+            public int i;
+            public int j;
+            //public bool isVisited;
+
+            public Match(int i, int j)
+            {
+                this.i = i;
+                this.j = j;
+                //this.isVisited = isVisited;
+            }
+
+        }
+
+        public struct Bonus
+        {
+            public int i;
+            public int j;
+            public int value;           //0 - none, 1 - LineHor, 2 - line Vert, 3 - bomb
+
+            public Bonus(int i, int j, int value)
+            {
+                this.i = i;
+                this.j = j;
+                this.value = value;
+            }
+
+        }
+
+
+
+        public List<Match> _match;
+        public Match _horizontalMatch;
+        public Match _verticalMatch;
+
         public List<text_menu> text_menus;
 
-        public Field(int width, int height, int start_x, int start_y, int block_size, int difficulty, string player_name) //user defined field constructor 
+        public void FieldCreate(Shape shape)
         {
-            this.height = height;
-            this.width = width;
-            this.start_x = start_x;
-            this.start_y = start_y;
-            this.block_size = block_size;
-            this.player_name = player_name;
-            this.period = 150;  //from constructor
 
-            switch (difficulty)
+            for (var i = 0; i < FIELD_SIZE; i++)
+            {
+                for (var j = 0; j < FIELD_SIZE; j++)
+                {
+                    this._field[i, j] = shape.ShapeCreate();
+                }
+            }
+
+            GenerateByDifficulty(1);
+
+            for (var i = 0; i < FIELD_SIZE; i++)
+            {
+                for (var j = 0; j < FIELD_SIZE; j++)
+                {
+                    Shuffle(i, j);
+                }
+            }
+
+
+            //this._field[0, 0] = 4;
+
+            //check if 10-15% 
+            //Console.WriteLine(shapeType.ToString());
+
+            // Render();
+
+        }
+
+        public Field()
+        {
+            this._match = new List<Match>();
+            this.shape = new Shape();
+            this._bonus = new Bonuses();
+
+            this._field = new int[FIELD_SIZE, FIELD_SIZE];
+
+            FieldCreate(shape);
+        }
+
+
+        public float[] userInput(int i1, int j1, int i2, int j2)
+        {
+            float[] values = new float[4];
+
+            if (IfMatch(i2, j2) == 0)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    values[i] = -1;
+                }
+                return values;
+            }
+            Swap(i1, j1, i2, j2);       //swap successfull
+
+            if (IfMatch(i1, j1) == 1)
+            {
+                DoBlast(i1, j1);
+                DoBlast(i2, j2);
+
+                values[0] = i2;
+                values[1] = j2;
+                values[2] = i1;
+                values[3] = j1;
+            }
+            else
+            {
+                DoBlast(i2, j2);
+
+                values[0] = i2;
+                values[1] = j2;
+                values[2] = -1;     //"empty" entry
+                values[3] = -1;
+            }
+
+
+            return values;
+        }
+
+        public List<Bonus> BlastHorLine(int i, int j)
+        {
+            List<Bonus> ToBlast = new List<Bonus>();
+
+            List<Bonus> Temp = new List<Bonus>();
+
+            int value = 1;
+
+            ToBlast.Add(new Bonus(i,j, value));
+
+            for (int k = 0; k < FIELD_SIZE; k++)
+            {
+                if ((this._field[k, j] >= 8) || (this._field[k, j] < 13))       //horizontal line bonus
+                {
+                    Temp = BlastHorLine(k, j);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[k, j] >= 13) || (this._field[k, j] < 18))      //vert line bonus
+                {
+                    Temp = BlastVertLine(k, j);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[k, j] >= 18) || (this._field[k, j] < 23))      //bomb bonus
+                {
+                    Temp = BlastBomb(k, j);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                this._field[k, j] = 23;
+            }
+
+            List<Bonus> NoDupes = ToBlast.Distinct().ToList();
+
+            return NoDupes;
+        }
+
+        public List<Bonus> BlastVertLine(int i, int j)
+        {
+            int value = 2;
+
+            List<Bonus> ToBlast = new List<Bonus>();
+
+            List<Bonus> Temp = new List<Bonus>();
+
+            ToBlast.Add(new Bonus(i, j, value));
+
+            for (int k = 0; k < FIELD_SIZE; k++)
+            {
+                if ((this._field[i, k] >= 8) || (this._field[i, k] < 13))       //horizontal line bonus
+                {
+                    Temp = BlastHorLine(i, k);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[i, k] >= 13) || (this._field[i, k] < 18))      //vert line bonus
+                {
+                    Temp = BlastVertLine(i, k);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[i, k] >= 18) || (this._field[i, k] < 23))      //bomb bonus
+                {
+                    Temp = BlastBomb(i, k);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                this._field[i, k] = 23;
+            }
+
+            List<Bonus> NoDupes = ToBlast.Distinct().ToList();
+
+            return NoDupes;
+
+        }
+
+        public List<Bonus> BlastBomb(int i, int j)
+        {
+            int value = 3;
+
+            List<Match> BombBlast = new List<Match>();
+
+            List<Bonus> ToBlast = new List<Bonus>();
+
+            List<Bonus> Temp = new List<Bonus>();
+
+            ToBlast.Add(new Bonus(i, j, value));
+
+            if (i - 1 > 0)
+            {
+                if (j - 1 > 0)
+                {
+                    BombBlast.Add(new Match(i - 1, j - 1));
+                }
+                if (j + 1 < FIELD_SIZE)
+                {
+                    BombBlast.Add(new Match(i - 1, j + 1));
+                }
+                BombBlast.Add(new Match(i - 1, j));
+            }
+
+            if (i + 1 > 0)
+            {
+                if (j - 1 > 0)
+                {
+                    BombBlast.Add(new Match(i + 1, j - 1));
+                }
+                if (j + 1 < FIELD_SIZE)
+                {
+                    BombBlast.Add(new Match(i + 1, j + 1));
+                }
+                BombBlast.Add(new Match(i + 1, j));
+            }
+
+            if (j - 1 > 0)
+            {
+                BombBlast.Add(new Match(i, j - 1));
+            }
+            if (j + 1 < FIELD_SIZE)
+            {
+                BombBlast.Add(new Match(i, j + 1));
+            }
+            BombBlast.Add(new Match(i, j));
+
+            int c, z;
+
+            for (int k = 0; k < BombBlast.Count; k++)
+            {
+                c = BombBlast[k].i;
+                z = BombBlast[k].j;
+
+                if ((this._field[c, z] >= 8) || (this._field[c, z] < 13))       //horizontal line bonus
+                {
+                    Temp = BlastHorLine(c, z);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[c, z] >= 13) || (this._field[c, z] < 18))      //vert line bonus
+                {
+                    Temp = BlastVertLine(c, z);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                if ((this._field[c, z] >= 18) || (this._field[c, z] < 23))      //bomb bonus
+                {
+                    Temp = BlastBomb(c, z);
+
+                    for (int m = 0; m < Temp.Count; m++)
+                    {
+                        ToBlast.Add(new Bonus(Temp[m].i, Temp[m].j, Temp[m].value));
+                    }
+
+                    Temp = new List<Bonus>();
+                }
+
+                this._field[c, z] = 23;
+            }
+
+
+            List<Bonus> NoDupes = ToBlast.Distinct().ToList();
+            
+
+            return NoDupes;
+        }
+
+        public void SpawnHorLine(int i, int j, int value)
+        {
+            this._field[i, j] = GetHorLineValue(value);
+        }
+
+        public void SpawnVertLine(int i, int j, int value)
+        {
+            this._field[i, j] = GetVertLineValue(value);
+        }
+
+        public void SpawnBomb(int i, int j, int value)
+        {
+            this._field[i, j] = GetBombValue(value);
+        }
+
+        public int GetHorLineValue(int value)
+        {
+            return value + OFFSET;
+        }
+
+        public int GetBombValue(int value)
+        {
+            return value + OFFSET * 3;
+        }
+
+        public int GetVertLineValue(int value)
+        {
+            return value + OFFSET * 2;
+        }
+
+        /*
+        LineVertGreen = 8,      
+            LineVertPurple = 9,
+            LineVertRed = 10,
+            LineVertBlue = 11,
+            LineVertYellow = 12,
+
+            LineHorGreen = 13,
+            LineHorPurple = 14,
+            LineHorRed = 15,
+            LineHorBlue = 16,
+            LineHorYellow = 17,
+
+            BombGreen = 18,
+            BombPurple = 19,
+            BombRed = 20,
+            BombBlue = 21,
+            BombYellow = 22,
+
+            Nothing = 23      
+        */
+
+        public int blast(int i, int j)
+        {
+
+
+            return 1;
+        }
+
+        public List<Bonus> DoBlast(int i, int j)            //0 - just blast, 1 - hor line blast, 2 - vert line blast, 3 - bomb blast
+        {
+            List<Match> match = new List<Match>();
+
+            List<Bonus> toprocede = new List<Bonus>();
+
+            List<Bonus> temp = new List<Bonus>();
+
+            match = WhereMatch(i, j);
+
+            int value = this._field[match[0].i, match[0].j];
+
+            int toWhere = match.Count - 1;
+            int BonusType = 0;
+
+
+
+            List<Bonus> Bonuses = new List<Bonus>();
+
+            if (match[match.Count - 1].i > FIELD_SIZE)
+            {
+                toWhere = match.Count;          //Bonus present
+                BonusType = match[match.Count - 1].i;
+            }
+
+
+            int c, z;
+
+            for (int m = 0; m < toWhere; m++)
+            {
+                c = match[m].i;
+                z = match[m].j;
+                
+                if ((this._field[c, z] >= 8) || (this._field[c, z] < 13))       //horizontal line bonus
+                {
+                    temp = BlastHorLine(c, z);
+
+                    for (int p = 0; p < temp.Count; p++)
+                    {
+                        toprocede.Add(new Bonus(temp[m].i, temp[m].j, temp[m].value));
+                    }
+
+                    temp = new List<Bonus>();
+                }
+
+                if ((this._field[c, z] >= 13) || (this._field[c, z] < 18))      //vert line bonus
+                {
+                    temp = BlastVertLine(c, z);
+
+                    for (int p = 0; p < temp.Count; p++)
+                    {
+                        toprocede.Add(new Bonus(temp[m].i, temp[m].j, temp[m].value));
+                    }
+
+                    temp = new List<Bonus>(); 
+                }
+
+                if ((this._field[c, z] >= 18) || (this._field[c, z] < 23))      //bomb bonus
+                {
+                    temp = BlastVertLine(c, z);
+
+                    for (int p = 0; p < temp.Count; p++)
+                    {
+                        toprocede.Add(new Bonus(temp[m].i, temp[m].j, temp[m].value));
+                    }
+
+                    temp = new List<Bonus>();
+                }
+            }
+
+            switch (BonusType)
+            {
+                case 444:
+                    SpawnHorLine(i, j, this._field[i, j]);
+                    break;
+                case 555:
+                    SpawnVertLine(i, j, this._field[i, j]);
+                    break;
+                case 666:
+                    SpawnBomb(i, j, this._field[i, j]);
+                    break;
+                case 0:
+                    break;
+            }
+
+            Bonuses = toprocede.Distinct().ToList();
+            return Bonuses;
+        }
+
+        public void DoBlast(int i1, int j1, int i2, int j2)
+        {
+            List<Match> match1 = new List<Match>();
+            match1 = WhereMatch(i1, j1);
+
+            List<Match> match2 = new List<Match>();
+            match2 = WhereMatch(i2, j2);
+
+        }
+
+        public void Shuffle(int i, int j)
+        {
+            if (IfMatch(i, j) == 0)
+                return;
+
+            List<Match> matches = new List<Match>();
+
+            int notmatch;
+            int value = this._field[i, j];
+            matches = WhereMatch(i, j);
+
+
+            while (IfMatch(i, j) == 1)
+            {
+                for (int m = 0; m < matches.Count - 1; m++) {       //without bonuses
+
+                            notmatch = shape.ShapeCreate();
+                            while (notmatch == value)
+                                {
+                                    notmatch = shape.ShapeCreate();
+                                }
+                            this._field[matches[m].i, matches[m].j] = notmatch;   
+
+                }
+            }
+
+            //Render();
+
+
+
+        }
+
+        public void Swap(int i1, int j1, int i2, int j2)
+        {
+            int temp = this._field[i1,j1];
+            this._field[i1, j1] = this._field[i2, j2];
+            this._field[i2, j2] = temp;
+        }
+
+        public void GenerateByDifficulty(int difficulty_seed)
+        {
+            Random _random = new Random();
+
+            int Steps, Seed; 
+            int i, j;   //indices of field
+
+            //const int min = 5, max = 7;
+
+            switch (difficulty_seed)
             {
                 case 1:
-                    this.period = 150;
+                    Steps = _random.Next(5, 7);
+
+                    Console.WriteLine(Steps);
+
+                    for (int k = 0; k < Steps; k++)
+                    {
+                        i = _random.Next(0, FIELD_SIZE - 1);
+                        j = _random.Next(0, FIELD_SIZE - 1);
+                        Seed = _random.Next(0, 3);
+                        Generate(i, j, Seed);
+                    }
                     break;
                 case 2:
-                    this.period = 120;
+                    Steps = _random.Next(3, 5);
+
+                    for (int k = 0; k < Steps; k++)
+                    {
+                        i = _random.Next(0, FIELD_SIZE - 1);
+                        j = _random.Next(0, FIELD_SIZE - 1);
+                        Seed = _random.Next(0, 3);
+                        Generate(i, j, Seed);
+                    }
+
                     break;
                 case 3:
-                    this.period = 90;
-                    break;
-            }
+                    Steps = _random.Next(2, 4);
 
-            this.area = new char[width, height];
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    this.area[i, j] = ' ';
-                }
-            }
-        }
-
-        public void render()
-        {
-            Console.SetCursorPosition(0, 0);
-
-            string output = string.Empty;
-
-            for (int i = 0; i < this.height; i++)
-            {
-                for (int j = 0; j < this.width; j++)
-                {
-                    output += this.area[j, i];
-                }
-                output += "|\n";
-
-                if (i == 1)
-                {
-                    for (int j = 0; j < this.width; j++)
+                    for (int k = 0; k < Steps; k++)
                     {
-                        output += '-';
+                        i = _random.Next(0, FIELD_SIZE - 1);
+                        j = _random.Next(0, FIELD_SIZE - 1);
+                        Seed = _random.Next(0, 3);
+                        Generate(i, j, Seed);
                     }
-                    output += "|\n";
-                }
-            }
 
-            for (int j = 0; j < this.width; j++)
-            {
-                output += "^";
-            }
-
-            output += "|\n Score: " + this.score + "\n (Space)Rotate" + " (<-)Left " + "(->)Right (↓)Down \n (P)Pause (F)Faster (S)Slower (Q)Quit";
-
-            Console.Write(output);
-
-        }
-
-        public int update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
-        {
-            input = Console.ReadKey(true);
-
-            switch (input.Key)
-            {
-                case ConsoleKey.LeftArrow:
-                    figure.move_left(grid);
-                    break;              //watch breaks and returns
-
-                case ConsoleKey.RightArrow:
-                    figure.move_right(grid);
                     break;
-
-                case ConsoleKey.DownArrow:
-                    figure.move_down(grid);
-                    break;
-
-                case ConsoleKey.Spacebar:
-                    figure.rotate(grid);
-                    break;
-
-                case ConsoleKey.Q:
-                    grid.exit = true;
-                    return 1;
-
-                case ConsoleKey.P:
-                    grid.pause = !grid.pause;
-                    return 2;
-
-                case ConsoleKey.F:
-                    if (grid.period > 10)
-                        grid.period -= 10;
-                    return 3;
-
-                case ConsoleKey.S:
-                    if (grid.period < 300)
-                        grid.period += 10;
-                    return 4;
             }
 
-            return 0;
-        }
 
-        static void high_score()
-        {
-            string file_name = "Tetris.records";
-            string path = AppDomain.CurrentDomain.BaseDirectory + file_name;
-            string output = string.Empty;
-            if (!File.Exists(path))
-            {
-                using (StreamWriter write = File.CreateText(path))
-                {
-                    for (int i = 0; i < 67; i++)
-                    {
-                        output += "#";
-                    }
-                    write.WriteLine(output);
-                }
-
-            }
-        }
-
-        public void game_over()
-        {
-            Console.WriteLine("12312312341441q");
-            System.Threading.Thread.Sleep(500);
-
-        }
-
-        static int navigation(ConsoleKeyInfo input)
-        {
-            switch (input.Key)
-            {
-                case ConsoleKey.S:
-                    return 0;
-
-                case ConsoleKey.H:
-                    return 1;
-
-                case ConsoleKey.Q:
-                    return 2;
-
-                case ConsoleKey.Y:
-                    return 3;
-
-                case ConsoleKey.N:
-                    return 4;
-
-                case ConsoleKey.D1:
-                    return 5;
-
-                case ConsoleKey.D2:
-                    return 6;
-
-                case ConsoleKey.D3:
-                    return 7;
-            }
-            return 8;
-
-        }
-
-        static void start(string[] alltext, int state)
-        {
-            string output = string.Empty;
-            ConsoleKeyInfo input_key;
-
-            int choice_start_menu = 0;
-
-            Console.SetCursorPosition(0, 0);
-            output = alltext[0] + alltext[7];
-            //Console
 
 
         }
 
-        static int static_screens_travel(string[] alltext, int state, int choice)
+        public void Generate(int i, int j, int seed)
         {
-            switch (state)
-            {
-                case 0:             //main menu
-                    switch (choice)
-                    {
-                        case 0:
-                            game(10, 15, alltext, state);
-                            return 1;
-                        case 1:
-                            return 1;
-                        case 2:
-                            escape(alltext, state);
-                            return 2;
-                        case 3:
-                            return 3;
-                        case 4:
-                            return 4;
-                    }
-                    break;
-                case 1:            //difficulty choice menu
-                    break;
-                case 2:            //field size choice menu
-                    break;
-                case 4:            //high score screen
-                    break;
-                case 5:            //quit screen
-                    break;
-            }
-            return 5;
-        }
+            int value = this._field[i, j];
 
-        static void main_menu(string[] alltext, int state)
-        {
-            List<text_menu> text_Menus = new List<text_menu>();
+            if (value == 11)
+                return;
 
-            //    shape_map = new List<shape_block>();
-            //List<shape_block> check_map = new List<shape_block>();
-            state = 0;
-            string output = string.Empty;
+            Console.WriteLine(i.ToString()+ " |||| " + j.ToString());
 
-            int choice_main_menu = 0;
-            ConsoleKeyInfo input_key;
-
-            Console.SetCursorPosition(0, 0);
-
-            output = alltext[14] + alltext[0] + alltext[2];
-
-            while (alltext[10] == string.Empty)
-            {
-                Console.Write(output);
-                alltext[10] = Console.ReadLine();
-                Console.Clear();
-            }
-            Console.SetCursorPosition(0, 0);
-            output = alltext[14] + alltext[0] + alltext[3] + alltext[10] + alltext[13] + alltext[5];//alltext[4] + alltext[5];
-            Console.Write(output);
-
-            input_key = Console.ReadKey(true);
-            Console.Clear();
-
-            while ((choice_main_menu = navigation(input_key)) > 7)
-            {
-                Console.Write(output);
-                input_key = Console.ReadKey(true);
-                Console.Clear();
-            }
-
-
-            // static_screens_travel(alltext, state, choice_main_menu);
-            // return;
-
-
-            switch (choice_main_menu)
+            switch (seed)
             {
                 case 0:
-                    game(15, 20, alltext, state);
-                    break;
-                case 1:
-                    high_score();
-                    break;
-                case 2:
-                    escape(alltext, state);
-                    return;
-
-                case 3:
-                    return;
-
-                case 4:
-                    return;
-            }
-
-
-
-
-        }
-
-        static void escape(string[] alltext, int state)
-        {
-            int choice = 0;
-            ConsoleKeyInfo input_key;
-            Console.Write("Are you sure?(Y/N)");
-            input_key = Console.ReadKey(true);
-            Console.Clear();
-
-            while ((choice = navigation(input_key)) > 7)
-            {
-                Console.Write("Are you sure?(Y/N)");
-                input_key = Console.ReadKey(true);
-                Console.Clear();
-            }
-
-            switch (choice)
-            {
-                case 3:
-                    return;
-                case 4:
-                    main_menu(alltext, state);
-                    break;
-            }
-        }
-
-        static int game(int width, int height, string[] alltext, int state)
-        {
-            Console.WriteLine("Press Any key");
-            const int PLAYER_TIMEOUT = 3;
-
-            int counter = 0;
-
-            Field grid = new Field(width, height, 0, 0, 10, 0, alltext[10]);
-
-
-            Shape figure = new Shape(grid);
-
-            ConsoleKeyInfo input = Console.ReadKey(true);
-
-            grid.render();
-
-            while (grid.exit == false)
-            {
-                if (grid.gameover == true)
-                {
-                    Console.Clear();
-                    Console.WriteLine(alltext[15] + "\n Press Any key");
-                    Console.ReadKey();
-                    Console.Clear();
-                    main_menu(alltext, state);
-                    return 4;   //game over state
-                }
-
-                grid.render();
-
-                Task<int> task_update = new Task<int>(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
-                task_update.Start();
-
-                while (grid.pause == true)
-                {
-                    if (grid.exit)
+                    try
                     {
-                        Console.Clear();
-                        Console.WriteLine(alltext[15] + "\n Press Any key");
-                        Console.ReadKey();
-                        Console.Clear();
-                        main_menu(alltext, state);
-                        return 3;
-                    }      //quit
-                    System.Threading.Thread.Sleep(500);
-                }
+                        if (i + 2 < FIELD_SIZE)
+                            this._field[i + 2, j] = value;
+                        this._field[i + 1, j] = value;
 
-                if ((counter % grid.period) == 0)
-                {
-                    figure.move_down(grid);  //giving time to react
-                }
+                        if (i - 1 > 0)
+                            this._field[i - 1, j] = value;
+                    }
+                    catch
+                    {
 
-                counter++;
-                System.Threading.Thread.Sleep(PLAYER_TIMEOUT);
+                    }
+                        break;
+                case 1:
+                    try
+                    {
+                        this._field[i - 1, j] = value;
+                        this._field[i - 2, j] = value;
+                    }
+                    catch
+                    {
+                    }
+                    break;
+
+                case 2:
+                    try
+                    {
+                        if (i + 2 < FIELD_SIZE)
+                            this._field[i, j + 1] = value;
+                        this._field[i, j + 2] = value;
+                        if (j - 1 > 0)
+                            this._field[i, j - 1] = value;
+                    }
+                    catch
+                    {
+                    }
+                    break;
+
+                case 3:
+                    try
+                    {
+                        this._field[i, j - 1] = value;
+                        this._field[i, j - 2] = value;
+                    }
+                    catch
+                    {
+                    }
+                    break;
             }
+           
 
 
-            Console.Clear();
-            Console.WriteLine(alltext[15] + "\n Press Any key");
-            Console.ReadKey();
-            Console.Clear();
-            main_menu(alltext, state);
-            return 1; //game over
-        }
 
-        static void game_over_sequence()
-        {
-            //check double tap on gameover sequence
-        }
-
-        static void tetris(string[] args)
-        {
-            //all text menu divided by pieces
-            string[] alltext =
-                { "\n##########W E L C O M E         T O         T E T R I S !##########", //0
-                "\n###########H I G H                           S C O R E S###########", //1
-                "\nEnter player name: ", //2 
-                "\nPlayer: ", //3
-                "\n(H)Show highscores ", //4 
-                "\n(Q)Quit Tetris ", //5
-                "\nAre you sure(Y/N)?", //6
-                "\nChoose difficulty:\n(1)Easy\n(2)Medium\n(3)Hard,", //7
-                "\nChoose field size:\n(1)Little\n(2)Medium\n(3)Big", //8
-                "\nPlayer                                                        Score", //9
-                "", //10
-                "\n(Backspace)Back", //11
-                "\n(Esc)Back to the main menu", //12
-                "\n(S)Start new game: ", //13
-                @"    _________  _______  _________  ________  ___  ________      " + "\n" + @"   |\___   ___\\  ___ \|\___   ___\\   __  \|\  \|\   ____\     " + "\n" +
-                @"   \|___ \  \_\ \   __/\|___ \  \_\ \  \|\  \ \  \ \  \___|_    " +"\n" + @"        \ \  \ \ \  \_|/__  \ \  \ \ \   _  _\ \  \ \_____  \   " +
-                "\n" + @"         \ \  \ \ \  \_|\ \  \ \  \ \ \  \\  \\ \  \|____|\  \  " + "\n" + @"          \ \__\ \ \_______\  \ \__\ \ \__\\ _\\ \__\____\_\  \ " +
-                "\n" + @"           \|__|  \|_______|   \|__|  \|__|\|__|\|__|\_________\"+"\n"+ @"                                                    \|_________|",   //14
-                @" ________  ________  _____ ______   _______          " + "\n" + @"|\   ____\|\   __  \|\   _ \  _   \|\  ___ \         " + "\n" +
-                @"\ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|        " + "\n" + @" \ \  \  __\ \   __  \ \  \\|__| \  \ \  \_|/__      " + "\n" +
-                @"  \ \  \|\  \ \  \ \  \ \  \    \ \  \ \  \_|\ \     " +"\n" +@"   \ \_______\ \__\ \__\ \__\    \ \__\ \_______\    " + "\n" +
-                @"    \|_______|\|__|\|__|\|__|     \|__|\|_______|    " +"\n" +@" ________  ___      ___ _______   ________           " + "\n" +
-                @"|\   __  \|\  \    /  /|\  ___ \ |\   __  \          " + "\n" +@"\ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \         " +"\n" +
-                @" \ \  \\\  \ \  \/  / / \ \  \_|/_\ \   _  _\        " +"\n" +@"  \ \  \\\  \ \    / /   \ \  \_|\ \ \  \\  \|       " +"\n" +
-                @"   \ \_______\ \__/ /     \ \_______\ \__\\ _\       " + "\n" +@"    \|_______|\|__|/       \|_______|\|__|\|__|      "       //15
-                };
-            int state = 0;
-
-            Console.WriteLine(alltext[14] + "\n Press Any key");
-            Console.ReadKey();
-            Console.Clear();
-            //main menu - 1) 0 2    2)0 3 10 13 4 5 
-            //start menu - 1) 0 7 11   2)0 8 11
-            //quit menu - 1) 0 6
-            //high scores 1) 0 1 9 %highscores%
-
-            main_menu(alltext, state);
-            //high_score();
-            //string player_name = string.Empty;
-            //game(15,20, player_name);
             return;
         }
+
+        public List<Match> WhereMatch(int i, int j)
+        {
+            int value = this._field[i, j];
+
+            int[] bonus_values = new int[3];
+
+            bonus_values[0] = GetHorLineValue(value);
+            bonus_values[1] = GetVertLineValue(value);
+            bonus_values[2] = GetBombValue(value);
+
+
+            List<Match> Match = new List<Match>();
+
+            List<Match> Temp = new List<Match>();
+
+            Match Bonus = new Match();
+
+            List<Match> MatchTypeHor = new List<Match>();
+            List<Match> MatchTypeVert = new List<Match>();
+
+            int BombIndex = 666;
+            int horizontalIndex = 444;
+            int verticalIndex = 555;
+
+
+            if (i < FIELD_SIZE)
+            {
+               for (int k = i; k < FIELD_SIZE; k++)
+                {
+                    if ((this._field[k, j] == value) || (this._field[k, j] == bonus_values[0]) || (this._field[k, j] == bonus_values[1]) || (this._field[k, j] == bonus_values[2]))
+                        Temp.Add(new Match(k, j));
+                    else break;
+                }
+
+                foreach (Match m in Temp)
+                {
+                    Match.Add(m);
+                    MatchTypeHor.Add(m);
+                }
+
+                Temp = new List<Match>();
+            }
+
+            if(j < FIELD_SIZE)
+            {
+                for (int k = j; k < FIELD_SIZE; k++)
+                {
+                    if ((this._field[i, k] == value) || (this._field[i, k] == bonus_values[0]) || (this._field[i, k] == bonus_values[1]) || (this._field[i, k] == bonus_values[2]))
+                        Temp.Add(new Match(i, k));
+                    else break;
+                }
+
+                foreach (Match m in Temp)
+                {
+                    Match.Add(m);
+                    MatchTypeVert.Add(m);
+                }
+
+                Temp = new List<Match>();
+            }
+            
+            if (i > 0)
+            {
+                for (int k = i; k > 0; k--)
+                {
+                    if ((this._field[k, j] == value) || (this._field[k, j] == bonus_values[0]) || (this._field[k, j] == bonus_values[1]) || (this._field[k, j] == bonus_values[2]))
+                        Temp.Add(new Match(k, j));
+                    else break;
+                }
+
+                foreach (Match m in Temp)
+                {
+                    Match.Add(m);
+                    MatchTypeHor.Add(m);
+                }
+
+                Temp = new List<Match>();
+            }
+
+            if (j > 0)
+            {
+                for (int k = j; k > 0; k--)
+                {
+                    if ((this._field[i, k] == value) || (this._field[i, k] == bonus_values[0]) || (this._field[i, k] == bonus_values[1]) || (this._field[i, k] == bonus_values[2]))
+                        Temp.Add(new Match(i, k));
+                    else break;
+                }
+
+                foreach (Match m in Temp)
+                {
+                    Match.Add(m);
+                    MatchTypeVert.Add(m);
+                }
+
+                Temp = new List<Match>();
+            }
+
+            List<Match> NoDuplicatesHor = MatchTypeHor.Distinct().ToList();
+            List<Match> NoDuplicatesVert = MatchTypeVert.Distinct().ToList();
+            List<Match> NoDuplicates = Match.Distinct().ToList();
+
+            if (NoDuplicatesHor.Count >= BOMB_BONUS)
+            {                                               //addding info about bonuses
+                Bonus = new Match(BombIndex, BombIndex);
+                NoDuplicates.Add(Bonus);
+                return NoDuplicates;
+            }
+
+            if (NoDuplicatesVert.Count >= BOMB_BONUS)
+            {
+                Bonus = new Match(BombIndex, BombIndex);
+                NoDuplicates.Add(Bonus);
+                return NoDuplicates;
+            }
+
+            if ((NoDuplicatesVert.Count >= LINE_BONUS) || (NoDuplicatesHor.Count >= LINE_BONUS))
+            {
+                if (NoDuplicatesVert.Count > NoDuplicatesHor.Count)
+                {
+                    Bonus = new Match(verticalIndex, verticalIndex);
+                }
+                else
+                    Bonus = new Match(horizontalIndex, horizontalIndex);
+
+                NoDuplicates.Add(Bonus);
+                return NoDuplicates;
+            }
+
+            return NoDuplicates;
+        }
+
+
+        public int IfMatch(int i, int j)
+        {
+            int value = this._field[i, j];
+
+            if (value == 23)
+                return 0;
+
+            int[] bonus_values = new int[3];
+
+            bonus_values[0] = GetHorLineValue(value);
+            bonus_values[1] = GetVertLineValue(value);
+            bonus_values[2] = GetBombValue(value);
+
+
+
+            try
+            {
+                if ((this._field[i + 1, j] == value) || (this._field[i + 1, j] == bonus_values[0]) || (this._field[i + 1, j]  == bonus_values[1]) || (this._field[i + 1, j] == bonus_values[2])) 
+                {
+                    if ((this._field[i + 2, j] == value) || (this._field[i + 2, j] == bonus_values[0]) || (this._field[i + 2, j] == bonus_values[1]) || (this._field[i + 2, j] == bonus_values[2])) 
+                    {
+                        return 1;
+                    }
+
+                    if ((this._field[i - 1, j] == value) || (this._field[i - 1, j] == bonus_values[0]) || (this._field[i - 1, j] == bonus_values[1]) || (this._field[i - 1, j] == bonus_values[2])) 
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if ((this._field[i - 1, j] == value) || (this._field[i - 1, j] == bonus_values[0]) || (this._field[i - 1, j] == bonus_values[1]) || (this._field[i - 1, j] == bonus_values[2])) 
+                {
+                    if ((this._field[i - 2, j] == value) || (this._field[i - 2, j] == bonus_values[0]) || (this._field[i - 2, j] == bonus_values[1]) || (this._field[i - 2, j] == bonus_values[2])) 
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if ((this._field[i, j + 1] == value) || (this._field[i, j + 1] == bonus_values[0]) || (this._field[i, j + 1] == bonus_values[1]) || (this._field[i, j + 1] == bonus_values[2])) 
+                {
+                    if((this._field[i, j + 2] == value) || (this._field[i, j + 2] == bonus_values[0]) || (this._field[i, j + 2] == bonus_values[1]) || (this._field[i, j + 2] == bonus_values[2])) 
+                    {
+                        return 1;
+                    }
+
+                    if ((this._field[i, j - 1] == value) || (this._field[i, j - 1] == bonus_values[0]) || (this._field[i, j - 1] == bonus_values[1]) || (this._field[i, j - 1] == bonus_values[2])) 
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if ((this._field[i, j - 1] == value) || (this._field[i, j - 1] == bonus_values[0]) || (this._field[i, j - 1] == bonus_values[1]) || (this._field[i, j - 1] == bonus_values[2])) 
+                {
+                    if ((this._field[i, j - 2] == value) || (this._field[i, j - 2] == bonus_values[0]) || (this._field[i, j - 2] == bonus_values[1]) || (this._field[i, j - 2] == bonus_values[2])) 
+                    {
+                        return 1;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return 0;       //No Matches
+
+        }
+
+
 
     }
 
