@@ -13,7 +13,6 @@ C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\soft_oal.dll
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\SDL2.dll
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\soft_oal.dll
-C:\Users\Пека\source\repos\Match3Classic\Match3Classic\obj\Debug\netcoreapp3.1\Match3Classic.csprojAssemblyReference.cache
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\obj\Debug\netcoreapp3.1\Match3Classic.AssemblyInfoInputs.cache
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\obj\Debug\netcoreapp3.1\Match3Classic.AssemblyInfo.cs
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\obj\Debug\netcoreapp3.1\Match3Classic.csproj.CoreCompileInputs.cache
@@ -87,3 +86,4 @@ C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\нитро лево.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\нитро право.xnb
 C:\Users\Пека\source\repos\Match3Classic\Match3Classic\bin\Debug\netcoreapp3.1\Content\img\fx\огонек.xnb
+C:\Users\Пека\source\repos\Match3Classic\Match3Classic\obj\Debug\netcoreapp3.1\Match3Classic.csprojAssemblyReference.cache

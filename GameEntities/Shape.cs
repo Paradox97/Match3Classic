@@ -62,17 +62,10 @@ namespace Match3Classic
 
         public List<shape_block> shape_map;
 
-        public Shape(Field grid) //Shape constructor
+        public Shape() //Shape constructor
         {
             //shape_map_create(grid);
         }
-
-        public Shape()
-        {
-
-
-        }
-
         public int ShapeCreate()
         {
             ShapeType[] shapes = ((ShapeType[])Enum.GetValues(typeof(ShapeType)));
